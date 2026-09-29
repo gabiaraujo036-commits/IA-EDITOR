@@ -1,0 +1,28 @@
+{
+  "referencia": "trend viral: dança -> whip pan -> selfie -> reação em close",
+  "formato": {"largura": 720, "altura": 1280, "fps": 24},
+  "duracao_total": 12.0,
+  "estilo_global": "vertical 9:16 smartphone footage, ultra wide 0.5x lens, golden hour sunset light, handheld, TikTok dance trend, realistic",
+  "modelo": "fal-ai/kling-video/v2.1/standard/image-to-video",
+  "audio": null,
+  "cenas": [
+    {
+      "id": 1, "inicio": 0.0, "fim": 4.5, "duracao": 4.5,
+      "quadro_referencia": "cena_01.jpg", "imagem_inicial": null,
+      "prompt": "a man dances enthusiastically in an empty parking lot, hands up celebrating, ultra wide low angle, camera slowly pushing in, ends with a fast whip pan to the right with motion blur",
+      "transicao": "whip pan"
+    },
+    {
+      "id": 2, "inicio": 4.5, "fim": 7.9, "duracao": 3.4,
+      "quadro_referencia": "cena_02.jpg", "imagem_inicial": null,
+      "prompt": "selfie video, smiling man in bucket hat dancing with one arm raised at a gas station at sunset, tilted dutch angle, handheld",
+      "transicao": "corte"
+    },
+    {
+      "id": 3, "inicio": 7.9, "fim": 12.0, "duracao": 4.1,
+      "quadro_referencia": "cena_03.jpg", "imagem_inicial": null,
+      "prompt": "man with round glasses and beard gets out of a car, camera pushes in fast to an extreme close-up of his face, he looks serious, closes his eyes, then breaks into a big smile, wind in his hair",
+      "transicao": "push-in"
+    }
+  ]
+}
