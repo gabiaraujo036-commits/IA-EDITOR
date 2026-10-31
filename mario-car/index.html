@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body>
+<title>Mario Car Aberta</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Silkscreen:wght@400;700&family=Chakra+Petch:wght@500;700&display=swap">
+<style>
+/* Layout: one 9:16 arcade screen (story/reels format) with a scene timeline, controls below. Single dark look by choice. */
+:root{
+  --night:#12111c;
+  --asphalt:#1f1d2e;
+  --red:#e8352b;
+  --red-deep:#7a1712;
+  --sun:#ffc93c;
+  --cream:#f6f0e1;
+  --teal:#2ec4b6;
+  --go:#3ddc6b;
+  --dim:#8a87a6;
+  --display:'Bungee', Impact, 'Arial Black', sans-serif;
+  --pixel:'Silkscreen', ui-monospace, 'Courier New', monospace;
+  --body:'Chakra Petch', system-ui, sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{
+  background:var(--night);color:var(--cream);font-family:var(--body);
+  margin:0;box-sizing:border-box;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:16px;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+*,*::before,*::after{box-sizing:inherit}
+
+.stage{
+  position:relative;
+  width:min(100%, 420px);
+  width:min(100%, max(280px, calc((100dvh - 110px) * 9 / 16)));
+  max-width:100%;
+  aspect-ratio:9/16;
+  container-type:inline-size;
+  overflow:hidden;
+  border-radius:14px;
+  background:var(--night);
+  box-shadow:0 0 0 3px var(--asphalt), 0 0 0 5px var(--red), 0 20px 60px rgba(0,0,0,.6);
+  user-select:none;
+}
+#bg{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.scanlines{position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0 2px, rgba(0,0,0,.18) 2px 3px);mix-blend-mode:multiply}
+
+/* HUD */
+.hud{position:absolute;top:4cqw;left:4cqw;right:4cqw;display:flex;justify-content:space-between;align-items:center;z-index:3;
+  font-family:var(--pixel);font-size:3.3cqw;letter-spacing:.06em}
+.hud .mini{font-family:var(--display);font-size:4.4cqw;color:var(--cream);text-shadow:.4cqw .4cqw 0 var(--red)}
+.hud .mini b{color:var(--sun);font-weight:400}
+.pill{display:flex;align-items:center;gap:1.6cqw;padding:1cqw 2.4cqw;border:.5cqw solid var(--go);color:var(--go);border-radius:99px;background:rgba(18,17,28,.7)}
+.pill i{width:2cqw;height:2cqw;border-radius:50%;background:var(--go);box-shadow:0 0 2cqw var(--go);animation:blink 1s steps(2) infinite}
+
+/* Scenes */
+.scene{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4cqw;padding:16cqw 6cqw 14cqw;text-align:center;opacity:0;visibility:hidden;transition:opacity .35s, visibility .35s}
+.scene.on{opacity:1;visibility:visible}
+
+.logo{display:flex;flex-direction:column;line-height:.92;font-family:var(--display)}
+.logo .l1{font-size:22cqw;color:var(--cream);text-shadow:.8cqw .8cqw 0 var(--red), 1.6cqw 1.6cqw 0 var(--red-deep)}
+.logo .l2{font-size:30cqw;color:var(--sun);text-shadow:.8cqw .8cqw 0 var(--red), 1.6cqw 1.6cqw 0 var(--red-deep)}
+.scene.on .logo{animation:slam .8s cubic-bezier(.2,1.6,.4,1) both}
+.flag{display:flex;gap:0;width:50cqw;height:4cqw;
+  background:conic-gradient(var(--cream) 25%, var(--night) 0 50%, var(--cream) 0 75%, var(--night) 0) 0 0/4cqw 4cqw}
+.press{font-family:var(--pixel);font-size:5cqw;color:var(--sun);letter-spacing:.08em;animation:blink 1s steps(2) infinite}
+.kicker{font-family:var(--pixel);font-size:4cqw;letter-spacing:.12em;color:var(--dim)}
+
+/* Open scene: start lights */
+.lights{display:flex;gap:4cqw;padding:3.5cqw 5cqw;background:#08070e;border:1cqw solid var(--asphalt);border-radius:5cqw}
+.lamp{width:14cqw;height:14cqw;border-radius:50%;background:#2a2633;box-shadow:inset 0 -1.2cqw 0 rgba(0,0,0,.4);transition:background .08s, box-shadow .08s}
+.lamp.red{background:var(--red);box-shadow:0 0 6cqw var(--red), inset 0 -1.2cqw 0 rgba(0,0,0,.25)}
+.lamp.green{background:var(--go);box-shadow:0 0 7cqw var(--go), inset 0 -1.2cqw 0 rgba(0,0,0,.2)}
+.open-text{display:flex;flex-direction:column;line-height:.95;font-family:var(--display);opacity:0;transform:scale(.4)}
+.open-text .a{font-size:13cqw;color:var(--cream)}
+.open-text .b{font-size:17cqw;color:var(--go);text-shadow:.8cqw .8cqw 0 #136b31}
+.go .open-text{animation:slam .6s cubic-bezier(.2,1.6,.4,1) forwards}
+.open-sub{font-family:var(--pixel);font-size:4.2cqw;color:var(--sun);letter-spacing:.06em;opacity:0}
+.go .open-sub{animation:fadeup .5s .35s forwards}
+.countdown{font-family:var(--pixel);font-size:5cqw;color:var(--dim);height:6cqw}
+
+/* Stock scene */
+.stock-head{display:flex;justify-content:space-between;align-items:baseline;width:100%;font-family:var(--pixel)}
+.stock-head .t{font-size:5cqw;letter-spacing:.1em;color:var(--cream)}
+.stock-head .pct{font-family:var(--display);font-size:10cqw;color:var(--sun);font-variant-numeric:tabular-nums}
+.meter{width:100%;height:4.5cqw;border:.6cqw solid var(--cream);padding:.6cqw;display:grid;grid-template-columns:repeat(20,1fr);gap:.5cqw}
+.meter span{background:var(--asphalt)}
+.meter span.on{background:var(--sun)}
+.meter span.on:nth-child(n+15){background:var(--red)}
+.lot{width:100%;display:grid;grid-template-columns:repeat(4,1fr);gap:2.4cqw 2cqw;padding:3cqw;border:.5cqw dashed rgba(246,240,225,.35);border-radius:2cqw}
+.lot canvas{width:100%;aspect-ratio:2/1;image-rendering:pixelated;transform:scale(0);transition:transform .25s cubic-bezier(.2,1.8,.4,1)}
+.lot canvas.in{transform:scale(1)}
+.stock-wrap{position:relative;width:100%;display:flex;flex-direction:column;gap:3cqw}
+.stamp{position:absolute;left:50%;top:58%;font-family:var(--display);font-size:9.5cqw;line-height:1;color:var(--red);
+  background:var(--cream);border:1.2cqw solid var(--red);padding:2.4cqw 3.6cqw;white-space:nowrap;
+  transform:translate(-50%,-50%) rotate(-9deg) scale(3);opacity:0;box-shadow:1.5cqw 1.5cqw 0 rgba(0,0,0,.5)}
+.full .stamp{animation:stamp .35s cubic-bezier(.3,1.4,.5,1) forwards}
+
+/* Select scene */
+.sel-title{font-family:var(--pixel);font-weight:700;font-size:5.4cqw;color:var(--sun);letter-spacing:.08em}
+.garage{position:relative;width:100%;display:flex;align-items:center;justify-content:center}
+#carCanvas{width:100%;aspect-ratio:96/44;image-rendering:pixelated}
+.arrow{position:absolute;top:38%;font-family:var(--pixel);font-size:7cqw;color:var(--cream);background:none;border:0;padding:1cqw 2cqw;cursor:pointer;animation:nudge .8s ease-in-out infinite}
+.arrow.l{left:-2cqw;--dx:-1cqw}.arrow.r{right:-2cqw;--dx:1cqw}
+.arrow:focus-visible{outline:.6cqw solid var(--sun);outline-offset:.4cqw}
+.car-info{display:flex;flex-direction:column;align-items:center;gap:2cqw;width:100%}
+.car-info.pop{animation:fadeup .35s both}
+.car-name{font-family:var(--display);font-size:13cqw;line-height:1;color:var(--cream);text-shadow:.7cqw .7cqw 0 var(--red)}
+.car-tag{font-family:var(--body);font-weight:700;font-size:4.4cqw;color:var(--teal)}
+.ready{font-family:var(--pixel);font-size:3.4cqw;letter-spacing:.1em;color:var(--night);background:var(--go);padding:.8cqw 2.4cqw}
+.stats{width:100%;display:grid;grid-template-columns:auto 1fr;gap:2cqw 3cqw;align-items:center;margin-top:1cqw}
+.stats dt{font-family:var(--pixel);font-size:3.6cqw;text-align:left;color:var(--dim);letter-spacing:.06em}
+.stats dd{margin:0;display:grid;grid-template-columns:repeat(5,1fr);gap:1cqw;height:3.4cqw}
+.stats dd span{background:var(--asphalt);transition:background .15s}
+.stats dd span.on{background:var(--teal)}
+.stats dd span.on.max{background:var(--sun)}
+.dots{display:flex;gap:2cqw}
+.dots i{width:2.4cqw;height:2.4cqw;background:var(--asphalt);border:.4cqw solid var(--dim)}
+.dots i.on{background:var(--sun);border-color:var(--sun)}
+
+/* CTA */
+.cta-small{font-family:var(--pixel);font-size:4.4cqw;color:var(--cream);letter-spacing:.08em}
+.cta-line{font-family:var(--display);font-size:9cqw;line-height:1.05;color:var(--cream)}
+.cta-line em{font-style:normal;color:var(--sun)}
+.scene.on .cta-line{animation:slam .7s cubic-bezier(.2,1.6,.4,1) both}
+.badges{display:flex;flex-direction:column;gap:2.4cqw;width:100%}
+.badge{font-family:var(--pixel);font-weight:700;font-size:4.4cqw;letter-spacing:.06em;padding:2.2cqw 3cqw;border:.6cqw solid currentColor;display:flex;justify-content:space-between}
+.badge.g{color:var(--go)}.badge.y{color:var(--sun)}
+.scene.on .badge{animation:fadeup .4s both}
+.scene.on .badge:nth-child(2){animation-delay:.15s}
+
+/* Controls */
+.controls{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;width:min(100%, 420px)}
+.controls button{font-family:var(--pixel);font-size:13px;letter-spacing:.05em;color:var(--cream);background:var(--asphalt);
+  border:2px solid var(--dim);padding:8px 12px;cursor:pointer;min-height:40px}
+.controls button:hover{border-color:var(--sun);color:var(--sun)}
+.controls button:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+.controls #play{border-color:var(--sun);color:var(--sun)}
+.hint{font-family:var(--pixel);font-size:11px;color:var(--dim);text-align:center;max-width:420px}
+
+@keyframes blink{50%{opacity:0}}
+@keyframes slam{0%{transform:scale(2.6);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes fadeup{from{opacity:0;transform:translateY(3cqw)}to{opacity:1;transform:none}}
+@keyframes stamp{to{transform:translate(-50%,-50%) rotate(-9deg) scale(1);opacity:1}}
+@keyframes nudge{50%{transform:translateX(var(--dx))}}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+
+<div class="stage" id="stage" aria-label="Animação Mario Car: estamos abertos, estoque cheio">
+  <canvas id="bg" width="90" height="160"></canvas>
+
+  <div class="hud">
+    <span class="mini">MARIO <b>CAR</b></span>
+    <span class="pill"><i></i>ABERTO</span>
+  </div>
+
+  <section class="scene on" data-d="3400">
+    <span class="kicker">PLAYER 1 • NOVA PARTIDA</span>
+    <div class="logo"><span class="l1">MARIO</span><span class="l2">CAR</span></div>
+    <div class="flag"></div>
+    <span class="press">APERTE START</span>
+  </section>
+
+  <section class="scene" data-d="4200" id="sOpen">
+    <div class="lights"><i class="lamp"></i><i class="lamp"></i><i class="lamp"></i></div>
+    <span class="countdown" id="count">PREPARAR...</span>
+    <div class="open-text"><span class="a">ESTAMOS</span><span class="b">ABERTOS!</span></div>
+    <span class="open-sub">A LOJA TÁ ON. PODE ACELERAR!</span>
+  </section>
+
+  <section class="scene" data-d="4600" id="sStock">
+    <div class="stock-wrap">
+      <div class="stock-head"><span class="t">ESTOQUE</span><span class="pct" id="pct">0%</span></div>
+      <div class="meter" id="meter"></div>
+      <div class="lot" id="lot"></div>
+      <div class="stamp">ESTOQUE CHEIO!</div>
+    </div>
+    <span class="kicker">PÁTIO LOTADO DE OPÇÕES</span>
+  </section>
+
+  <section class="scene" id="sSelect">
+    <span class="sel-title">ESCOLHA SEU CARRO</span>
+    <div class="garage">
+      <button class="arrow l" id="aPrev" aria-label="Carro anterior">◀</button>
+      <canvas id="carCanvas" width="96" height="44"></canvas>
+      <button class="arrow r" id="aNext" aria-label="Próximo carro">▶</button>
+    </div>
+    <div class="car-info" id="info">
+      <span class="car-name" id="carName">HATCH</span>
+      <span class="car-tag" id="carTag">Ágil na cidade</span>
+      <span class="ready">PRONTA ENTREGA</span>
+      <dl class="stats" id="stats"></dl>
+    </div>
+    <div class="dots" id="dots"></div>
+  </section>
+
+  <section class="scene" data-d="4800">
+    <span class="cta-small">SEU PRÓXIMO CARRO TÁ AQUI</span>
+    <div class="cta-line">VEM PRA<br><em>MARIO CAR</em></div>
+    <div class="badges">
+      <span class="badge g"><span>LOJA</span><span>ABERTA ✔</span></span>
+      <span class="badge y"><span>ESTOQUE</span><span>CHEIO ✔</span></span>
+    </div>
+    <span class="press">▶ TEST DRIVE LIBERADO</span>
+  </section>
+
+  <div class="scanlines"></div>
+</div>
+
+<div class="controls">
+  <button id="prev" aria-label="Carro anterior">◀ CARRO</button>
+  <button id="play">PAUSAR</button>
+  <button id="restart">DO INÍCIO</button>
+  <button id="next" aria-label="Próximo carro">CARRO ▶</button>
+</div>
+<p class="hint">Use as setas do teclado para trocar de carro e espaço para pausar.</p>
+
+<script>
+(() => {
+  const PAL = {night:'#12111c', asphalt:'#1f1d2e', red:'#e8352b', sun:'#ffc93c', cream:'#f6f0e1', teal:'#2ec4b6', dim:'#8a87a6'};
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const CARS = [
+    {type:'hatch',  name:'HATCH',     tag:'Ágil e econômico na cidade',  color:'#e8352b', stats:[3,5,2,3]},
+    {type:'sedan',  name:'SEDÃ',      tag:'Porta-malas de respeito',     color:'#3a6df0', stats:[3,4,4,4]},
+    {type:'suv',    name:'SUV',       tag:'Altura e espaço pra família', color:'#f6f0e1', stats:[3,3,5,5]},
+    {type:'pickup', name:'PICAPE',    tag:'Encara qualquer serviço',     color:'#ffc93c', stats:[3,2,5,3]},
+    {type:'sport',  name:'ESPORTIVO', tag:'Pra quem tem pressa',         color:'#2ec4b6', stats:[5,2,1,3]},
+  ];
+  const STAT_NAMES = ['VELOCIDADE','ECONOMIA','ESPAÇO','CONFORTO'];
+  const CAR_MS = 3000;
+
+  // Side-view car shapes on a 48x24 grid, facing right, ground at y≈21.5
+  const SHAPES = {
+    hatch:  {body:[[3,18],[3,13],[7,11],[39,11],[45,13.5],[45,18]], cab:[[8,11],[11,5],[28,5],[35,11]], w:[11,37], r:3.5},
+    sedan:  {body:[[2,18],[2,12.5],[8,11],[41,11],[46,13.5],[46,18]], cab:[[11,11],[16,5],[30,5],[36,11]], w:[11,38], r:3.5},
+    suv:    {body:[[3,18],[3,10],[41,10],[46,12.5],[46,18]], cab:[[4,10],[6,3.5],[33,3.5],[39,10]], w:[11,38], r:4.2, rack:true},
+    pickup: {body:[[2,18],[2,11],[45,11],[47,13.5],[47,18]], cab:[[23,11],[25,4],[35,4],[40,11]], w:[10,39], r:4, bed:true},
+    sport:  {body:[[2,17.5],[2,13],[11,11.5],[37,11],[46,14],[46,17.5]], cab:[[13,11.5],[19,7],[29,7],[35,11]], w:[11,38], r:3.4, wing:true},
+  };
+
+  function path(c, pts){ c.beginPath(); pts.forEach(([x,y],i)=> i?c.lineTo(x,y):c.moveTo(x,y)); c.closePath(); }
+  function shade(hex, f){
+    const n = parseInt(hex.slice(1),16); let r=n>>16, g=(n>>8)&255, b=n&255;
+    const t = f<0?0:255, p=Math.abs(f);
+    return `rgb(${Math.round((t-r)*p+r)},${Math.round((t-g)*p+g)},${Math.round((t-b)*p+b)})`;
+  }
+
+  function drawCar(c, car, x, y, ang){
+    const s = SHAPES[car.type], col = car.color;
+    c.save(); c.translate(x,y);
+    // cabin glass + frame
+    path(c, s.cab); c.fillStyle = '#2b3a5c'; c.fill();
+    c.lineWidth = 1.3; c.strokeStyle = col; c.stroke();
+    const top = s.cab[1][1], mid = (s.cab[1][0]+s.cab[2][0])/2 + 1;
+    c.fillStyle = col; c.fillRect(mid-0.6, top, 1.3, s.cab[0][1]-top);
+    c.fillStyle = 'rgba(255,255,255,.35)'; c.fillRect(s.cab[1][0]+1.5, top+1, 3, 1);
+    if (s.rack){ c.fillStyle = PAL.dim; c.fillRect(8, top-1.4, 22, .9); }
+    // body
+    path(c, s.body); c.fillStyle = col; c.fill();
+    c.save(); path(c, s.body); c.clip();
+    c.fillStyle = 'rgba(0,0,0,.28)'; c.fillRect(0, 16, 48, 3);
+    c.fillStyle = 'rgba(255,255,255,.35)'; c.fillRect(0, 12.6, 48, .8);
+    c.fillStyle = shade(col, -.35); c.fillRect(0, 14.8, 48, .6);
+    c.restore();
+    const xs = s.body.map(p=>p[0]), minX = Math.min(...xs), maxX = Math.max(...xs);
+    if (s.bed){ c.fillStyle = shade(col,-.4); c.fillRect(4, 11, 18, 1.2); c.fillRect(21, 9, 1.2, 2.5); }
+    if (s.wing){ c.fillStyle = shade(col,-.4); c.fillRect(2, 9, 7, 1.2); c.fillRect(4.5, 10, 1.2, 2); }
+    c.fillStyle = PAL.sun; c.fillRect(maxX-2.2, 12.8, 2.2, 1.6);
+    c.fillStyle = '#ff3b2f'; c.fillRect(minX, 12.8, 1.6, 1.8);
+    // wheels
+    for (const wx of s.w){
+      const wy = 21.5 - s.r;
+      c.beginPath(); c.arc(wx, wy, s.r+0.9, Math.PI, 0); c.fillStyle = '#0b0a12'; c.fill();
+      c.beginPath(); c.arc(wx, wy, s.r, 0, Math.PI*2); c.fillStyle = '#16151f'; c.fill();
+      c.beginPath(); c.arc(wx, wy, s.r*.58, 0, Math.PI*2); c.fillStyle = '#c4c1d4'; c.fill();
+      c.strokeStyle = '#16151f'; c.lineWidth = .8;
+      for (let k=0;k<3;k++){ const a = ang + k*Math.PI/3;
+        c.beginPath(); c.moveTo(wx-Math.cos(a)*s.r*.58, wy-Math.sin(a)*s.r*.58); c.lineTo(wx+Math.cos(a)*s.r*.58, wy+Math.sin(a)*s.r*.58); c.stroke(); }
+    }
+    c.restore();
+  }
+
+  // ---------- background (90x160 pixel scene) ----------
+  const bg = document.getElementById('bg'), bx = bg.getContext('2d');
+  let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
+  const stars = Array.from({length:46}, () => ({x:rnd()*90|0, y:rnd()*100|0, p:rnd()*6.28}));
+  const city = []; { let x = 0; while (x < 90){ const w = 5 + (rnd()*8|0), h = 10 + (rnd()*28|0); city.push({x,w,h,win:[]});
+    for (let wy=3; wy<h-3; wy+=4) for (let wx=1; wx<w-1; wx+=3) if (rnd()<.35) city[city.length-1].win.push([wx,wy]); x += w + (rnd()*2|0); } }
+  function drawBg(t){
+    const g = bx.createLinearGradient(0,0,0,140);
+    g.addColorStop(0,'#0e0d17'); g.addColorStop(.7,'#1b1530'); g.addColorStop(1,'#3a1830');
+    bx.fillStyle = g; bx.fillRect(0,0,90,160);
+    for (const s of stars){ const a = reduce ? .6 : .35 + .65*Math.abs(Math.sin(t/700 + s.p));
+      bx.fillStyle = `rgba(246,240,225,${a.toFixed(2)})`; bx.fillRect(s.x, s.y, 1, 1); }
+    for (const b of city){ const top = 138 - b.h; bx.fillStyle = '#17141f'; bx.fillRect(b.x, top, b.w, b.h);
+      bx.fillStyle = 'rgba(255,201,60,.55)'; for (const [wx,wy] of b.win) bx.fillRect(b.x+wx, top+wy, 1, 1); }
+    bx.fillStyle = PAL.asphalt; bx.fillRect(0,138,90,22);
+    const off = reduce ? 0 : (t/40) % 8;
+    for (let row=0; row<2; row++) for (let i=-1; i<13; i++){
+      bx.fillStyle = ((i+row)%2) ? PAL.cream : PAL.night;
+      bx.fillRect(i*8 - off + (row?0:0), 150 + row*4, 8, 4);
+    }
+    bx.fillStyle = PAL.red; bx.fillRect(0,148,90,2);
+  }
+
+  // ---------- scenes ----------
+  const scenes = [...document.querySelectorAll('.scene')];
+  const SEL = scenes.indexOf(document.getElementById('sSelect'));
+  scenes[SEL].dataset.d = CARS.length * CAR_MS;
+  const durs = scenes.map(s => +s.dataset.d);
+  const sOpen = document.getElementById('sOpen'), lamps = [...sOpen.querySelectorAll('.lamp')], count = document.getElementById('count');
+  const sStock = document.getElementById('sStock'), pct = document.getElementById('pct');
+  const meter = document.getElementById('meter'), lot = document.getElementById('lot');
+  for (let i=0;i<20;i++) meter.appendChild(document.createElement('span'));
+  const segs = [...meter.children];
+  const LOT_COLORS = ['#e8352b','#3a6df0','#f6f0e1','#ffc93c','#2ec4b6','#4a4e5a','#ff8a3d'];
+  const TYPES = Object.keys(SHAPES);
+  const tiles = [];
+  for (let i=0;i<20;i++){ const cv = document.createElement('canvas'); cv.width = 48; cv.height = 24;
+    drawCar(cv.getContext('2d'), {type:TYPES[(i*3)%5], color:LOT_COLORS[(i*5)%7]}, 0, 0, i); lot.appendChild(cv); tiles.push(cv); }
+
+  // select UI
+  const carCanvas = document.getElementById('carCanvas'), cc = carCanvas.getContext('2d');
+  const info = document.getElementById('info'), carName = document.getElementById('carName'), carTag = document.getElementById('carTag');
+  const statsEl = document.getElementById('stats'), dotsEl = document.getElementById('dots');
+  const statBars = STAT_NAMES.map(n => { const dt = document.createElement('dt'); dt.textContent = n; const dd = document.createElement('dd');
+    for (let i=0;i<5;i++){ const s = document.createElement('span'); s.style.transitionDelay = (i*60)+'ms'; dd.appendChild(s); }
+    statsEl.append(dt, dd); return [...dd.children]; });
+  CARS.forEach(() => dotsEl.appendChild(document.createElement('i')));
+  const dots = [...dotsEl.children];
+
+  let si = 0, st = 0, paused = false, manual = false, car = 0, carT = 0, lastT = performance.now();
+  const playBtn = document.getElementById('play');
+
+  function restartAnim(el){ el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); }
+  function setCar(i){
+    car = (i + CARS.length) % CARS.length; carT = 0;
+    const c = CARS[car];
+    carName.textContent = c.name; carTag.textContent = c.tag;
+    statBars.forEach((segs, k) => segs.forEach((s, j) => { s.classList.toggle('on', j < c.stats[k]); s.classList.toggle('max', c.stats[k] === 5); }));
+    dots.forEach((d, k) => d.classList.toggle('on', k === car));
+    info.classList.remove('pop'); void info.offsetWidth; info.classList.add('pop');
+  }
+  function enter(i){
+    si = i; st = 0;
+    scenes.forEach((s, k) => { if (k !== i) s.classList.remove('on'); });
+    restartAnim(scenes[i]);
+    sOpen.classList.remove('go'); lamps.forEach(l => l.className = 'lamp'); count.textContent = 'PREPARAR...';
+    sStock.classList.remove('full'); tiles.forEach(t => t.classList.remove('in')); segs.forEach(s => s.classList.remove('on')); pct.textContent = '0%';
+    if (i === SEL && !manual) setCar(0);
+  }
+  function setPaused(p){ paused = p; playBtn.textContent = p ? 'CONTINUAR' : 'PAUSAR'; }
+
+  function update(dt){
+    if (!paused){ st += dt; if (st >= durs[si]) enter((si + 1) % scenes.length); }
+    if (si === 1){
+      const go = st > 1900, lit = Math.min(3, Math.max(0, Math.floor((st - 350) / 480) + 1));
+      lamps.forEach((l, k) => l.className = 'lamp' + (go ? ' green' : k < lit ? ' red' : ''));
+      count.textContent = go ? 'VAI!' : lit ? String(4 - lit) : 'PREPARAR...';
+      sOpen.classList.toggle('go', go);
+    } else if (si === 2){
+      const n = Math.max(0, Math.min(20, Math.floor((st - 250) / 85)));
+      tiles.forEach((t, k) => t.classList.toggle('in', k < n));
+      segs.forEach((s, k) => s.classList.toggle('on', k < n));
+      pct.textContent = (n * 5) + '%';
+      sStock.classList.toggle('full', st > 2200);
+    } else if (si === SEL && !manual){
+      const idx = Math.min(CARS.length - 1, Math.floor(st / CAR_MS));
+      if (idx !== car) setCar(idx);
+    }
+  }
+
+  let roadOff = 0, wheel = 0;
+  function drawSelect(dt){
+    carT += dt; if (!reduce){ roadOff = (roadOff + dt * 0.06) % 12; wheel += dt * 0.012; }
+    cc.clearRect(0,0,96,44);
+    // spotlight
+    const g = cc.createRadialGradient(48,30,2,48,30,40); g.addColorStop(0,'rgba(255,201,60,.28)'); g.addColorStop(1,'rgba(255,201,60,0)');
+    cc.fillStyle = g; cc.fillRect(0,0,96,44);
+    cc.fillStyle = PAL.asphalt; cc.fillRect(0,33,96,11);
+    cc.fillStyle = PAL.cream; for (let x = -roadOff; x < 96; x += 12) cc.fillRect(Math.round(x), 38, 6, 1);
+    cc.fillStyle = PAL.red; cc.fillRect(0,33,96,1);
+    const k = reduce ? 1 : Math.min(1, carT / 450), e = 1 - Math.pow(1 - k, 3);
+    const x = -50 + (24 + 50) * e, bob = (!reduce && k === 1 && Math.floor(carT / 160) % 2) ? .5 : 0;
+    cc.fillStyle = 'rgba(0,0,0,.45)'; cc.beginPath(); cc.ellipse(x + 24, 34, 21, 1.6, 0, 0, Math.PI*2); cc.fill();
+    if (k < 1){ cc.fillStyle = 'rgba(246,240,225,.5)'; for (let i=0;i<4;i++) cc.fillRect(x - 10 - i*4, 18 + i*3, 8, .8); }
+    drawCar(cc, CARS[car], Math.round(x), 12.5 + bob, wheel);
+  }
+
+  function frame(now){
+    const dt = Math.min(100, now - lastT); lastT = now;
+    update(dt); drawBg(now);
+    if (si === SEL) drawSelect(dt);
+    requestAnimationFrame(frame);
+  }
+
+  function nav(d){
+    manual = true; setPaused(true);
+    if (si !== SEL){ enter(SEL); }
+    setCar(car + d);
+  }
+  document.getElementById('prev').onclick = document.getElementById('aPrev').onclick = () => nav(-1);
+  document.getElementById('next').onclick = document.getElementById('aNext').onclick = () => nav(1);
+  playBtn.onclick = () => {
+    if (paused && manual && si === SEL){ manual = false; st = car * CAR_MS; }
+    else if (paused) manual = false;
+    setPaused(!paused);
+  };
+  document.getElementById('restart').onclick = () => { manual = false; setPaused(false); enter(0); };
+  addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft'){ nav(-1); e.preventDefault(); }
+    else if (e.key === 'ArrowRight'){ nav(1); e.preventDefault(); }
+    else if (e.key === ' ' && e.target === document.body){ playBtn.click(); e.preventDefault(); }
+  });
+
+  setCar(0); drawSelect(0);
+  requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>
