@@ -147,6 +147,9 @@ body{
 .controls button:hover{border-color:var(--sun);color:var(--sun)}
 .controls button:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
 .controls #play{border-color:var(--sun);color:var(--sun)}
+.controls #sound{flex-basis:100%;border-color:var(--go);color:var(--go);font-weight:700}
+.controls #sound[aria-pressed="false"]{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 4px rgba(61,220,107,.25)}}
 .hint{font-family:var(--pixel);font-size:11px;color:var(--dim);text-align:center;max-width:420px}
 
 @keyframes blink{50%{opacity:0}}
@@ -221,12 +224,13 @@ body{
 </div>
 
 <div class="controls">
+  <button id="sound" aria-pressed="false">♪ LIGAR SOM</button>
   <button id="prev" aria-label="Carro anterior">◀ CARRO</button>
   <button id="play">PAUSAR</button>
   <button id="restart">DO INÍCIO</button>
   <button id="next" aria-label="Próximo carro">CARRO ▶</button>
 </div>
-<p class="hint">Use as setas do teclado para trocar de carro e espaço para pausar.</p>
+<p class="hint">Toque em qualquer lugar para ligar o som. Setas trocam de carro, espaço pausa, M liga ou desliga o som.</p>
 
 <script>
 (() => {
@@ -241,6 +245,82 @@ body{
     {type:'sport',  name:'ESPORTIVO', tag:'Pra quem tem pressa',         color:'#2ec4b6', stats:[5,2,1,3]},
   ];
   const STAT_NAMES = ['VELOCIDADE','ECONOMIA','ESPAÇO','CONFORTO'];
+
+  // ---------- audio: chiptune soundtrack + game SFX (Web Audio, all synthesized) ----------
+  let ac = null, master = null, musicBus = null, sfxBus = null, soundOn = false, noiseBuf = null;
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  function initAudio(){
+    if (ac) return;
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    ac = new AC();
+    master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
+    musicBus = ac.createGain(); musicBus.gain.value = .55; musicBus.connect(master);
+    sfxBus = ac.createGain(); sfxBus.gain.value = .9; sfxBus.connect(master);
+    noiseBuf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
+    const d = noiseBuf.getChannelData(0); for (let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+  }
+  function tone(freq, dur, {type='square', vol=.1, at=0, slide=0, bus=sfxBus}={}){
+    if (!ac || !soundOn) return;
+    const t = (at || ac.currentTime), o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + dur);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .005);
+    g.gain.exponentialRampToValueAtTime(.0008, t + dur);
+    o.connect(g); g.connect(bus); o.start(t); o.stop(t + dur + .02);
+  }
+  function noise(dur, {vol=.15, at=0, freq=1200, q=.8, bus=sfxBus}={}){
+    if (!ac || !soundOn) return;
+    const t = at || ac.currentTime, s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    s.buffer = noiseBuf; f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0008, t + dur);
+    s.connect(f); f.connect(g); g.connect(bus); s.start(t); s.stop(t + dur + .02);
+  }
+  const SFX = {
+    coin(){ const t = ac.currentTime; tone(988,.08,{vol:.09,at:t}); tone(1319,.35,{vol:.09,at:t+.08}); },
+    beep(){ tone(440,.22,{type:'square',vol:.1}); },
+    go(){ const t = ac.currentTime; tone(880,.6,{vol:.11,at:t}); tone(1320,.6,{vol:.05,at:t,type:'triangle'});
+          noise(.5,{vol:.12,freq:500,at:t}); },
+    tick(n){ tone(500 + n*45, .05, {type:'square', vol:.05}); },
+    stamp(){ const t = ac.currentTime; tone(160,.35,{type:'triangle',vol:.35,slide:50,at:t}); noise(.25,{vol:.35,freq:300,at:t});
+             [523,659,784,1047].forEach((f,i)=> tone(f,.3,{vol:.07,at:t+.12+i*.07})); },
+    vroom(){ const t = ac.currentTime; tone(70,.55,{type:'sawtooth',vol:.12,slide:240,at:t}); tone(72,.55,{type:'square',vol:.05,slide:250,at:t});
+             noise(.35,{vol:.06,freq:900,at:t}); tone(1568,.06,{vol:.05,at:t}); },
+    select(){ tone(660,.06,{vol:.06}); },
+    fanfare(){ const t = ac.currentTime; [[523,0],[659,.12],[784,.24],[1047,.36],[784,.52],[1047,.64]].forEach(([f,d],i)=>
+             tone(f, i===5?.6:.14, {vol:.09, at:t+d})); },
+  };
+  function sfx(name, arg){ if (ac && soundOn) SFX[name](arg); }
+
+  // Original 4-bar loop, 16th-note grid, 150 BPM
+  const STEP = 60 / 150 / 4;
+  const BASS = [48,48,55,48, 45,45,52,45, 41,41,48,41, 43,43,50,43];          // one note per 8th... per quarter-ish
+  const LEAD = [72,null,76,79, 81,null,79,76, 77,null,76,72, 74,null,71,74,
+                72,null,76,79, 84,null,83,81, 79,null,77,76, 74,72,74,null];
+  let step = 0, nextT = 0, timer = null;
+  function schedule(){
+    if (!ac || !soundOn) return;
+    while (nextT < ac.currentTime + .15){
+      const s = step % 64, bar = Math.floor(s / 16);
+      if (s % 4 === 0) tone(mtof(BASS[bar*4 + (s%16)/4] - 12), STEP*3.2, {type:'triangle', vol:.22, at:nextT, bus:musicBus});
+      if (s % 2 === 0){ const n = LEAD[(s/2) % 32]; if (n) tone(mtof(n), STEP*1.7, {type:'square', vol:.045, at:nextT, bus:musicBus}); }
+      if (s % 8 === 4) noise(.09, {vol:.09, freq:2500, q:.6, at:nextT, bus:musicBus});           // snare
+      if (s % 8 === 0) tone(110, .12, {type:'sine', vol:.3, slide:40, at:nextT, bus:musicBus});   // kick
+      if (s % 2 === 1) noise(.03, {vol:.035, freq:8000, q:1, at:nextT, bus:musicBus});            // hat
+      nextT += STEP; step++;
+    }
+  }
+  function setSound(on){
+    initAudio(); if (!ac) return;
+    soundOn = on; ac.resume();
+    master.gain.cancelScheduledValues(ac.currentTime);
+    master.gain.setTargetAtTime(on ? .8 : 0, ac.currentTime, .05);
+    const b = document.getElementById('sound');
+    b.setAttribute('aria-pressed', on); b.textContent = on ? '♪ SOM LIGADO (M)' : '♪ LIGAR SOM';
+    clearInterval(timer);
+    if (on){ nextT = ac.currentTime + .05; timer = setInterval(schedule, 25); sfx('coin'); }
+  }
+  document.getElementById('sound').addEventListener('click', e => { e.stopPropagation(); setSound(!soundOn); });
+  addEventListener('pointerdown', e => { if (!ac && e.target.id !== 'sound') setSound(true); }, {capture:true});
   const CAR_MS = 3000;
 
   // Side-view car shapes on a 48x24 grid, facing right, ground at y≈21.5
@@ -354,14 +434,19 @@ body{
     statBars.forEach((segs, k) => segs.forEach((s, j) => { s.classList.toggle('on', j < c.stats[k]); s.classList.toggle('max', c.stats[k] === 5); }));
     dots.forEach((d, k) => d.classList.toggle('on', k === car));
     info.classList.remove('pop'); void info.offsetWidth; info.classList.add('pop');
+    if (si === SEL) sfx('vroom');
   }
+  let pLit = 0, pGo = false, pN = 0, pFull = false;
   function enter(i){
     si = i; st = 0;
     scenes.forEach((s, k) => { if (k !== i) s.classList.remove('on'); });
     restartAnim(scenes[i]);
     sOpen.classList.remove('go'); lamps.forEach(l => l.className = 'lamp'); count.textContent = 'PREPARAR...';
     sStock.classList.remove('full'); tiles.forEach(t => t.classList.remove('in')); segs.forEach(s => s.classList.remove('on')); pct.textContent = '0%';
+    pLit = 0; pGo = false; pN = 0; pFull = false;
     if (i === SEL && !manual) setCar(0);
+    if (i === 0) sfx('coin');
+    if (i === scenes.length - 1) sfx('fanfare');
   }
   function setPaused(p){ paused = p; playBtn.textContent = p ? 'CONTINUAR' : 'PAUSAR'; }
 
@@ -372,8 +457,14 @@ body{
       lamps.forEach((l, k) => l.className = 'lamp' + (go ? ' green' : k < lit ? ' red' : ''));
       count.textContent = go ? 'VAI!' : lit ? String(4 - lit) : 'PREPARAR...';
       sOpen.classList.toggle('go', go);
+      if (!go && lit > pLit) sfx('beep');
+      if (go && !pGo) sfx('go');
+      pLit = lit; pGo = go;
     } else if (si === 2){
       const n = Math.max(0, Math.min(20, Math.floor((st - 250) / 85)));
+      if (n > pN) sfx('tick', n);
+      if (st > 2200 && !pFull) sfx('stamp');
+      pN = n; pFull = st > 2200;
       tiles.forEach((t, k) => t.classList.toggle('in', k < n));
       segs.forEach((s, k) => s.classList.toggle('on', k < n));
       pct.textContent = (n * 5) + '%';
@@ -425,6 +516,7 @@ body{
     if (e.key === 'ArrowLeft'){ nav(-1); e.preventDefault(); }
     else if (e.key === 'ArrowRight'){ nav(1); e.preventDefault(); }
     else if (e.key === ' ' && e.target === document.body){ playBtn.click(); e.preventDefault(); }
+    else if (e.key === 'm' || e.key === 'M') setSound(!soundOn);
   });
 
   setCar(0); drawSelect(0);
