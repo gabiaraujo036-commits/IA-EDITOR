@@ -252,7 +252,7 @@ body{
   function initAudio(){
     if (ac) return;
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
-    ac = new AC();
+    ac = window.__mkAC ? window.__mkAC() : new AC();
     master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination);
     musicBus = ac.createGain(); musicBus.gain.value = .55; musicBus.connect(master);
     sfxBus = ac.createGain(); sfxBus.gain.value = .9; sfxBus.connect(master);
