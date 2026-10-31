@@ -2,101 +2,90 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<title>Mario Car Finados</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@500;700;800&display=swap">
+<title>Mário Car Finados</title>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@700;800;900&family=Barlow:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Two artboards: feed 1080x1350 and story 1080x1920. Quiet dusk road, text in the sky. */
-:root{
-  --sky-top:#161b2c; --sky-mid:#343551; --horizon:#c99079;
-  --ground:#0f1220; --road:#232637;
-  --cream:#f4ede4; --muted:#b9b2bf; --gold:#e6c48a; --tail:#ff4a3d;
-  --serif:'Cormorant Garamond', Georgia, serif;
-  --sans:'Manrope', 'Helvetica Neue', Arial, sans-serif;
-}
-*{box-sizing:border-box;margin:0}
-body{background:#000}
-.board{position:relative;width:1080px;overflow:hidden;color:var(--cream);font-family:var(--sans);
-  background:linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-mid) 42%, #6b5568 56%, var(--horizon) 64%, var(--horizon) 64.2%, var(--ground) 64.3%)}
-.feed{height:1350px;background:linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-mid) 46%, #6b5568 61%, var(--horizon) 70%, var(--ground) 70.05%)}
-.story{height:1920px;background:linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-mid) 50%, #6b5568 64%, var(--horizon) 73%, var(--ground) 73.05%)}
-.road{position:absolute;left:0;right:0;bottom:0;width:100%}
-.feed .road{height:405px}
-.story .road{height:519px}
+/* Same template as the 12 de Outubro post: store photo bg, logo top, symbol card, red bars + big date + red "NÃO ABRIREMOS" pill */
+:root{ --ink:#0F0F11; --red:#E1312A; --white:#FFFFFF; --soft:#EDEDF0; }
+body{margin:0;background:#000}
+.board{position:relative;width:1080px;overflow:hidden;background:var(--ink);color:var(--white);
+  font-family:'Saira Condensed','Arial Narrow',sans-serif}
+.feed{height:1350px}
+.story{height:1920px}
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;opacity:.4;filter:grayscale(.35)}
+.vignette{position:absolute;inset:0;background:radial-gradient(ellipse 560px 600px at 50% 38%, rgba(0,0,0,.78) 0%, rgba(0,0,0,.5) 50%, rgba(0,0,0,0) 100%)}
+.story .vignette{background:radial-gradient(ellipse 600px 820px at 50% 42%, rgba(0,0,0,.78) 0%, rgba(0,0,0,.5) 50%, rgba(0,0,0,0) 100%)}
+.wrap{position:absolute;inset:0;box-sizing:border-box;padding:76px 80px 80px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center}
+.story .wrap{padding:230px 80px 300px}
+.brand{display:flex;align-items:center;gap:8px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.6))}
+.brand img{width:100px;height:62px;display:block}
+.brand span{font-size:42px;font-weight:700;letter-spacing:.5px;line-height:1}
 
-.content{position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 96px}
-.feed .content{top:84px;gap:30px}
-.feed h1{font-size:90px}
-.story .content{top:270px;gap:44px}
+.card{width:360px;height:420px;border-radius:24px;overflow:hidden;position:relative;
+  background:radial-gradient(circle at 50% 34%, rgba(255,190,110,.32) 0%, rgba(255,190,110,.08) 30%, rgba(15,15,17,.92) 62%), #141417;
+  box-shadow:0 30px 60px rgba(0,0,0,.65), 0 8px 18px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08)}
+.story .card{width:400px;height:480px}
+.card svg{position:absolute;inset:0;width:100%;height:100%}
 
-.brand{font-family:var(--sans);font-weight:800;letter-spacing:.32em;font-size:30px;color:var(--cream);opacity:.92}
-.date{font-weight:700;font-size:26px;letter-spacing:.24em;color:var(--gold);text-transform:uppercase}
-.rule{width:64px;height:2px;background:var(--gold);opacity:.7}
-h1{font-family:var(--serif);font-weight:500;font-size:96px;line-height:1.02;letter-spacing:-.01em;text-wrap:balance}
-h1 em{font-style:italic;color:var(--gold)}
-.msg{font-size:33px;line-height:1.45;text-wrap:balance;color:var(--cream);opacity:.9;max-width:820px;font-weight:500}
-.notice{display:flex;flex-direction:column;gap:10px;align-items:center;padding:30px 54px;border:1.5px solid rgba(244,237,228,.45);border-radius:6px;background:rgba(22,27,44,.35)}
-.notice .k{font-weight:800;font-size:40px;letter-spacing:.14em}
-.notice .v{font-size:28px;color:var(--muted);font-weight:500}
-.notice .v b{color:var(--cream);font-weight:700}
-.story h1{font-size:118px}
-.story .msg{font-size:38px}
-.story .notice{padding:38px 64px}
-.story .notice .k{font-size:46px}
-.story .notice .v{font-size:32px}
+.bottom{display:flex;flex-direction:column;align-items:center;gap:22px}
+.kicker{display:flex;align-items:center;gap:20px;text-shadow:0 4px 16px rgba(0,0,0,.8)}
+.kicker i{width:60px;height:5px;background:var(--red)}
+.kicker b{font-size:46px;font-weight:800;letter-spacing:3px;line-height:1}
+.date{font-size:150px;font-weight:900;line-height:.9;text-shadow:0 8px 28px rgba(0,0,0,.7)}
+.pill{background:var(--red);border-radius:10px;padding:12px 34px 10px;font-size:52px;font-weight:800;letter-spacing:2px;line-height:1;box-shadow:0 14px 30px rgba(0,0,0,.55)}
+.note{font-family:'Barlow',sans-serif;font-size:32px;font-weight:600;line-height:1.35;color:var(--soft);text-shadow:0 3px 12px rgba(0,0,0,.8);margin-top:6px}
+.story .date{font-size:150px;white-space:nowrap}
+.story .bottom{gap:30px}
 </style>
 </head>
 <body>
-
 <template id="tpl">
-  <svg class="road" viewBox="0 0 1080 600" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
-    <defs>
-      <radialGradient id="sun" cx="50%" cy="0%" r="60%">
-        <stop offset="0" stop-color="#f3c39a" stop-opacity=".55"/>
-        <stop offset="1" stop-color="#f3c39a" stop-opacity="0"/>
-      </radialGradient>
-      <linearGradient id="rd" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#3a3647"/><stop offset="1" stop-color="#1c1f2e"/>
-      </linearGradient>
-      <filter id="glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="7"/></filter>
-    </defs>
-    <rect width="1080" height="600" fill="#0f1220"/>
-    <ellipse cx="540" cy="0" rx="620" ry="260" fill="url(#sun)"/>
-    <polygon points="528,0 552,0 900,600 180,600" fill="url(#rd)"/>
-    <g fill="#e6c48a" opacity=".75">
-      <polygon points="539,14 541,14 542,30 538,30"/>
-      <polygon points="538,52 542,52 544,82 536,82"/>
-      <polygon points="536,118 544,118 547,166 533,166"/>
-      <polygon points="532,222 548,222 553,300 527,300"/>
-      <polygon points="526,390 554,390 562,520 518,520"/>
-    </g>
-    <!-- car seen from behind, heading to the horizon -->
-    <g transform="translate(540 214)">
-      <ellipse cx="0" cy="40" rx="78" ry="9" fill="#000" opacity=".45"/>
-      <path d="M-50,-30 Q-44,-56 -30,-58 L30,-58 Q44,-56 50,-30 Z" fill="#141626"/>
-      <path d="M-40,-32 Q-36,-50 -26,-51 L26,-51 Q36,-50 40,-32 Z" fill="#4c4a63" opacity=".55"/>
-      <rect x="-72" y="-32" width="144" height="56" rx="14" fill="#1a1c2c"/>
-      <rect x="-72" y="18" width="20" height="22" rx="4" fill="#0b0c14"/>
-      <rect x="52" y="18" width="20" height="22" rx="4" fill="#0b0c14"/>
-      <rect x="-24" y="2" width="48" height="12" rx="2" fill="#2a2c3d"/>
-      <rect x="-64" y="-18" width="30" height="10" rx="4" fill="#ff4a3d" filter="url(#glow)"/>
-      <rect x="34" y="-18" width="30" height="10" rx="4" fill="#ff4a3d" filter="url(#glow)"/>
-      <rect x="-64" y="-18" width="30" height="10" rx="4" fill="#ff6a5a"/>
-      <rect x="34" y="-18" width="30" height="10" rx="4" fill="#ff6a5a"/>
-    </g>
-  </svg>
-  <div class="content">
-    <span class="brand">MARIO CAR</span>
-    <span class="date">2 de novembro · Dia de Finados</span>
-    <span class="rule"></span>
-    <h1>Hoje é dia de <em>lembrar</em> quem segue com a gente.</h1>
-    <p class="msg">Em respeito a esta data, nossa equipe estará com quem ama.</p>
-    <div class="notice">
-      <span class="k">LOJA FECHADA</span>
-      <span class="v">Segunda-feira, 02/11 · <b>Voltamos na terça, 03/11</b></span>
+  <img class="bg" src="assets/fachada.jpg" alt="">
+  <div class="vignette"></div>
+  <div class="wrap">
+    <div class="brand"><img src="assets/logo.png" alt="Logo Mário Car"><span>MÁRIO CAR</span></div>
+
+    <div class="card">
+      <svg viewBox="0 0 360 420" aria-hidden="true">
+        <defs>
+          <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stop-color="#ffd59a" stop-opacity=".75"/>
+            <stop offset=".45" stop-color="#ffb35c" stop-opacity=".22"/>
+            <stop offset="1" stop-color="#ffb35c" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="wax" x1="0" x2="1">
+            <stop offset="0" stop-color="#d9d6cf"/><stop offset=".45" stop-color="#fbfaf7"/><stop offset="1" stop-color="#bdb9b1"/>
+          </linearGradient>
+          <radialGradient id="flame" cx="50%" cy="70%" r="60%">
+            <stop offset="0" stop-color="#fffbe8"/><stop offset=".5" stop-color="#ffd66b"/><stop offset="1" stop-color="#ff8a2a"/>
+          </radialGradient>
+        </defs>
+        <circle cx="180" cy="128" r="120" fill="url(#halo)"/>
+        <!-- flame -->
+        <path d="M180 88 C 196 112, 198 132, 180 150 C 162 132, 164 112, 180 88 Z" fill="url(#flame)"/>
+        <path d="M180 116 C 187 128, 187 138, 180 146 C 173 138, 173 128, 180 116 Z" fill="#fff6d8"/>
+        <rect x="178.5" y="146" width="3" height="12" rx="1.5" fill="#2a2522"/>
+        <!-- candle -->
+        <path d="M150 160 Q180 152 210 160 L210 330 L150 330 Z" fill="url(#wax)"/>
+        <path d="M150 160 Q180 168 210 160" fill="none" stroke="#e9e6df" stroke-width="2"/>
+        <path d="M196 162 q4 22 0 38 q-3 8 -6 0 q-3 -16 0 -36 Z" fill="#f3f1ec" opacity=".9"/>
+        <!-- base -->
+        <ellipse cx="180" cy="334" rx="62" ry="12" fill="#2a2a30"/>
+        <rect x="118" y="330" width="124" height="16" rx="4" fill="#232328"/>
+        <ellipse cx="180" cy="346" rx="62" ry="10" fill="#1a1a1e"/>
+        <!-- red accent line from the brand -->
+        <rect x="150" y="376" width="60" height="4" fill="#E1312A"/>
+      </svg>
+    </div>
+
+    <div class="bottom">
+      <div class="kicker"><i></i><b>FERIADO DE<br>FINADOS</b><i></i></div>
+      <div class="date">2 DE NOVEMBRO</div>
+      <div class="pill">NÃO ABRIREMOS</div>
+      <div class="note">Dia de lembrar quem amamos · Voltamos na terça-feira, 03/11.</div>
     </div>
   </div>
 </template>
-
 <div class="board feed" id="feed"></div>
 <div class="board story" id="story"></div>
 <script>
