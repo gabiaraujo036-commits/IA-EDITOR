@@ -25,8 +25,9 @@ Datas: `hoje`, `ontem`, `DD/MM`, `DD/MM/AAAA` (fuso de São Paulo).
 2. Rodar `ponto/registrar.py` com os dados. Anotar o motivo com as palavras dela em `--nota`.
    Falta → `--obs Falta`; folga (inclusive a folga extra do mês) → `--obs Folga`; atestado → `--obs Atestado`.
 3. Conferir que o recálculo terminou com 0 erros.
-4. Commit (mensagem curta em português, ex.: "Ponto 10/11: chegada 08:54") e push no branch de trabalho
-   (`claude/planilha-ponto-mario-car`, a menos que a sessão indique outro).
+4. Commit (mensagem curta em português, ex.: "Ponto 10/11: chegada 08:54") e push **direto no `main`**
+   (`git push origin HEAD:main`). A usuária pediu que tudo fique no `main`, para qualquer conversa nova
+   encontrar o diário atualizado. Antes de registrar, rodar `git pull origin main` para pegar a versão mais recente.
 5. Responder em poucas linhas o que foi registrado e o resumo do dia/semana impresso pelo script
    (atraso, horário para completar a jornada, saldo, horas acima de 44h). Enviar a planilha com
    SendUserFile quando ela pedir ou no fim do dia (quando registrar a saída).
