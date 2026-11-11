@@ -1,11 +1,25 @@
 {
   "2026-11-10": {
     "chegada": "08:54",
-    "saida": "18:00"
+    "saida": "18:00",
+    "anotacoes": [
+      {
+        "tipo": "Outro",
+        "texto": "Não lembra os horários do almoço",
+        "registrado_em": "2026-11-11 14:09"
+      }
+    ]
   },
   "2026-11-11": {
     "chegada": "09:20",
     "saida_almoco": "13:09",
-    "volta_almoco": "14:08"
+    "volta_almoco": "14:08",
+    "anotacoes": [
+      {
+        "tipo": "Atraso",
+        "texto": "Estava com dor de barriga",
+        "registrado_em": "2026-11-11 14:09"
+      }
+    ]
   }
 }
