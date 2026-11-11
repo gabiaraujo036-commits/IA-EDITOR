@@ -2,11 +2,13 @@
   "2026-11-10": {
     "chegada": "08:54",
     "saida": "18:00",
+    "saida_almoco": "12:00",
+    "volta_almoco": "13:00",
     "anotacoes": [
       {
         "tipo": "Outro",
-        "texto": "Não lembra os horários do almoço",
-        "registrado_em": "2026-11-11 14:09"
+        "texto": "Tirou 1h de almoço; horários 12:00–13:00 são aproximados (não lembra os exatos)",
+        "registrado_em": "2026-11-11 14:18"
       }
     ]
   },
