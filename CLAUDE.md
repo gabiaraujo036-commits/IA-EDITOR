@@ -47,11 +47,16 @@ https://claude.ai/artifact/JjaVpTX7ePsXvYbzN4TtaX (código: `pauta/pauta-do-dia.
   "condicao": "Se o Mário aparecer" (opcional), "pulada": false (opcional), "etapas": [...]}], "atualizado": "<ISO>"}`.
 - Regra dela: **toda tarefa tem sempre 3 etapas**, nesta ordem:
   `{"nome": "Gravar", "feito": false}`, `{"nome": "Editar", "feito": false}`,
-  `{"nome": "Enviar ou programar", "opcoes": ["Enviar", "Programar"], "escolha": null, "feito": false}`.
-  Na última, ao concluir: `"escolha": "Enviar"` ou `"Programar"` e `"feito": true`.
+  `{"nome": "Enviar, programar ou postar", "opcoes": ["Enviar", "Programar", "Postar"], "escolha": null, "feito": false}`.
+  Na última, ao concluir: `"escolha": "Enviar"`, `"Programar"` ou `"Postar"` e `"feito": true`.
   Se a tarefa já chegou gravada (ex.: "editar o vídeo X"), criar com Gravar já `feito: true`.
   Tag "pra Rafa" faz a página mostrar "Enviar pra Rafa".
 - Ela marca as etapas tocando na página. Quando ela disser no chat que fez algo, ler o documento
   (`get`) e atualizar com `if_version`. Para totalizar o dia, ler o documento e resumir o que foi feito,
   o que ficou pendente e o que "não rolou" (tarefas com `pulada: true`).
 - Pendências que ela quiser levar para o dia seguinte: copiar só as etapas não feitas para o novo dia.
+
+- Aba "Para outro dia": tarefas sem data ficam no documento `listas/depois` (`{"tarefas": [...]}`,
+  com `adiadaDe` = dia de origem). Tarefas adiadas com data vão direto para o documento daquele dia
+  (`dias/AAAA-MM-DD`), também com `adiadaDe`. Quando ela pedir no chat para deixar algo para outro dia,
+  fazer o mesmo: tirar do dia atual e pôr no dia escolhido ou em `listas/depois`.

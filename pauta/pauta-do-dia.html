@@ -149,7 +149,8 @@ ol.tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-directio
 .final.next .fh .dot { border-color: var(--red); color: var(--red); }
 .final.done .fh .dot { background: var(--red); border-color: var(--red); color: var(--red-ink); }
 .final .fh small { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--red-text); margin-left: auto; }
-.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.seg button { text-align: center; line-height: 1.15; }
 .seg button { min-height: 46px; border-radius: 11px; border: 1.5px solid var(--line); background: var(--card); font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 8px; transition: background .2s, border-color .2s, opacity .2s, transform .12s; }
 .seg button:active { transform: scale(.97); }
 .seg button.on { background: var(--red); border-color: var(--red); color: var(--red-ink); }
@@ -170,6 +171,37 @@ ol.tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-directio
 .menu { display: flex; flex-wrap: wrap; gap: 6px; }
 .menu button { font-size: 13px; font-weight: 600; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--paper); cursor: pointer; }
 .menu button.danger { color: var(--red-text); border-color: var(--red); }
+
+/* ---------- abas e "para outro dia" ---------- */
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 14px; background: var(--line); }
+.tabs button { min-height: 44px; border: 0; border-radius: 11px; background: transparent; color: var(--muted); font-family: var(--f-display); font-weight: 700; font-size: 17px; text-transform: uppercase; letter-spacing: .02em; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: background .2s, color .2s; }
+.tabs button[aria-selected="true"] { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
+.tabs .n { font-family: var(--f-body); font-size: 12px; font-weight: 700; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 99px; background: var(--red); color: var(--red-ink); display: inline-grid; place-items: center; font-variant-numeric: tabular-nums; }
+.tabs .n:empty { display: none; }
+.mover { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); width: 100%; }
+.mover .mh { font-size: 13px; font-weight: 600; color: var(--muted); }
+.mover .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.mover input[type="date"] { font: 15px var(--f-body); padding: 9px 10px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); min-height: 44px; flex: 1 1 160px; min-width: 0; }
+.mover button { min-height: 44px; padding: 0 14px; border-radius: 10px; border: 0; background: var(--red); color: var(--red-ink); font-size: 14px; font-weight: 700; cursor: pointer; flex: 1 1 auto; }
+.mover button.sec { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
+.later { display: flex; flex-direction: column; gap: 10px; }
+.later h3 { margin: 6px 0 0; font-family: var(--f-display); font-weight: 800; font-size: 20px; text-transform: uppercase; letter-spacing: .02em; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.later h3 .ln { flex: 1; height: 2px; background: var(--line); }
+.lcard { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.lcard .title { font-family: var(--f-display); font-weight: 800; font-size: 22px; line-height: 1.05; text-transform: uppercase; }
+.lcard .meta { font-size: 13px; color: var(--muted); }
+.lcard .acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.lcard .acts button { min-height: 42px; padding: 0 14px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--line); background: transparent; color: var(--ink); }
+.lcard .acts button.pri { background: var(--red); border-color: var(--red); color: var(--red-ink); }
+.lcard .acts button.danger { color: var(--red-text); border-color: var(--red); }
+.dayrow { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; cursor: pointer; color: var(--ink); }
+.dayrow .dd { font-family: var(--f-display); font-weight: 800; font-size: 26px; line-height: 1; color: var(--red); min-width: 52px; font-variant-numeric: tabular-nums; }
+.dayrow .dt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dayrow .dt b { font-size: 14px; }
+.dayrow .dt span { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.dayrow .chev { color: var(--muted); font-size: 20px; }
+.sheet .when { display: flex; flex-direction: column; gap: 8px; }
+.sheet input[type="date"] { font: 16px var(--f-body); padding: 11px 12px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); width: 100%; }
 
 .empty { border: 1.5px dashed var(--line); border-radius: 18px; padding: 24px 18px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
 .empty strong { color: var(--ink); font-family: var(--f-display); font-size: 24px; text-transform: uppercase; }
@@ -264,6 +296,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
 
 <main class="wrap gut">
   <div class="inner">
+    <div class="tabs" role="tablist" aria-label="Abas">
+      <button role="tab" id="tab-dia" aria-selected="true">Pauta do dia</button>
+      <button role="tab" id="tab-depois" aria-selected="false">Para outro dia <span class="n" id="n-depois"></span></button>
+    </div>
+    <section class="later" id="later" hidden></section>
+    <div id="vdia" class="inner" style="max-width:none;padding:0;margin:0;width:100%">
     <div class="filters" role="group" aria-label="Filtro">
       <button data-f="todas" aria-pressed="true">Todas <span id="c-todas"></span></button>
       <button data-f="pendentes" aria-pressed="false">Pendentes <span id="c-pendentes"></span></button>
@@ -275,7 +313,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
       <strong>Nenhuma pauta para este dia</strong>
       <span>Mande no chat o que vai gravar e editar, ou toque em “Nova tarefa”.</span>
     </div>
-    <p class="foot">Toque numa etapa para marcar. No fim, escolha se o vídeo foi enviado ou programado. Tudo fica salvo e o Claude acompanha.</p>
+    </div>
+    <p class="foot">Toque numa etapa para marcar. No fim, escolha se o vídeo foi enviado, programado ou postado. Tudo fica salvo e o Claude acompanha.</p>
   </div>
 </main>
 
@@ -285,7 +324,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
 <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-h">
   <form class="inner gut" id="addform">
     <h2 id="sheet-h">Nova tarefa</h2>
-    <p class="hint">Entra com as três etapas: Gravar, Editar e Enviar ou programar.</p>
+    <p class="hint">Entra com as três etapas: Gravar, Editar e Enviar, programar ou postar.</p>
     <label class="f">O que é
       <input type="text" id="add-title" placeholder="Ex.: Vídeo do Onix" autocomplete="off" required>
     </label>
@@ -296,6 +335,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
     <label class="f" id="add-cond-wrap" hidden>Depende de quem?
       <input type="text" id="add-cond-txt" placeholder="Ex.: Se o Mário aparecer" autocomplete="off">
     </label>
+    <div class="when">
+      <label class="cb"><input type="checkbox" id="add-later"> Fazer outro dia</label>
+      <label class="f" id="add-later-wrap" hidden>Data (opcional: sem data, vai para “Para outro dia”)
+        <input type="date" id="add-date">
+      </label>
+    </div>
     <div class="acts">
       <button type="button" id="add-cancel">Cancelar</button>
       <button type="submit">Adicionar</button>
@@ -334,19 +379,22 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
   let db = null, dias = [], atual = HOJE, doc = undefined, unsubDoc = null, filtro = "todas", aberto = null;
   let podeEscrever = true, fila = Promise.resolve(), dbPronto = false, ultimoToque = null;
   const expandidos = new Set();
+  let aba = "dia", depois = undefined, diasDados = {}, movendo = null, confirmaLater = null;
   try { const f = localStorage.getItem("pauta-filtro"); if (f) filtro = f; } catch (e) {}
 
   /* ---------- modelo ---------- */
+  const OPCOES = ["Enviar", "Programar", "Postar"];
+  function feitoFinal(t, esc) { return esc === "Programar" ? "Programado" : esc === "Postar" ? "Postado" : (praRafa(t) ? "Enviado pra Rafa" : "Enviado"); }
   function etapaFinal(escolha) {
-    return { nome: "Enviar ou programar", opcoes: ["Enviar", "Programar"], escolha: escolha || null, feito: !!escolha };
+    return { nome: "Enviar, programar ou postar", opcoes: OPCOES.slice(), escolha: escolha || null, feito: !!escolha };
   }
   function normalizar(t) {
     const es = Array.isArray(t.etapas) ? t.etapas : [];
-    if (es.length === 3 && es[2] && Array.isArray(es[2].opcoes)) return t;
+    if (es.length === 3 && es[2] && Array.isArray(es[2].opcoes)) return Object.assign({}, t, { etapas: [es[0], es[1], Object.assign({}, es[2], { nome: "Enviar, programar ou postar", opcoes: OPCOES.slice() })] });
     const achar = (n) => es.find(e => e && e.nome === n);
     const g = achar("Gravar"), ed = achar("Editar");
     const env = es.find(e => e && /mandar|enviar|postar|programar/i.test(e.nome || ""));
-    const esc = env && env.feito ? (/program/i.test(env.nome) ? "Programar" : "Enviar") : null;
+    const esc = env && env.feito ? (/program/i.test(env.nome) ? "Programar" : /postar/i.test(env.nome) ? "Postar" : "Enviar") : null;
     return Object.assign({}, t, { etapas: [ { nome: "Gravar", feito: !!(g && g.feito) }, { nome: "Editar", feito: !!(ed && ed.feito) }, etapaFinal(esc) ] });
   }
   function normDoc(d) {
@@ -360,7 +408,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
   function proxima(t) { return t.etapas.findIndex(e => !e.feito); }
   function praRafa(t) { return (t.tags || []).some(x => /rafa/i.test(x)); }
   function rotuloEnviar(t) { return praRafa(t) ? "Enviar pra Rafa" : "Enviar"; }
-  function nomeEtapa(t, i) { return i === 2 ? "Enviar ou programar" : t.etapas[i].nome; }
+  function nomeEtapa(t, i) { return i === 2 ? "Enviar, programar ou postar" : t.etapas[i].nome; }
   function resumo(ts) {
     let total = 0, feitas = 0, vids = 0, vFeitos = 0; const por = [0, 0, 0];
     ts.forEach(t => {
@@ -473,7 +521,161 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
     $("next").disabled = !dias.some(d => d > atual);
     $("fab").hidden = !podeEscrever || !db;
     ultimoToque = null;
+    renderAbas();
   }
+
+  /* ---------- "para outro dia" ---------- */
+  function fmtData(iso) { const [y, m, d] = iso.split("-").map(Number); return String(d).padStart(2, "0") + "/" + String(m).padStart(2, "0"); }
+  function dowData(iso) { const [y, m, d] = iso.split("-").map(Number); return DOW[new Date(Date.UTC(y, m - 1, d, 12)).getUTCDay()]; }
+  function futuros() { return Object.keys(diasDados).filter(d => d > HOJE && (diasDados[d].tarefas || []).length).sort(); }
+  function semData() { return depois && Array.isArray(depois.tarefas) ? depois.tarefas : []; }
+
+  function caixaMover(titulo, aoMover) {
+    const box = el("div", "mover");
+    box.append(el("span", "mh", "Para quando? A data é opcional."));
+    const row = el("div", "row");
+    const inp = document.createElement("input"); inp.type = "date"; inp.id = "mv-date"; inp.min = HOJE; inp.setAttribute("aria-label", "Data para " + titulo);
+    const ir = el("button", null, "Mover sem data");
+    inp.addEventListener("input", () => { ir.textContent = inp.value ? "Mover para " + fmtData(inp.value) : "Mover sem data"; });
+    ir.addEventListener("click", () => aoMover(inp.value || null));
+    const cancelar = el("button", "sec", "Cancelar");
+    cancelar.addEventListener("click", () => { movendo = null; render(); });
+    row.append(inp, ir, cancelar);
+    box.append(row);
+    return box;
+  }
+
+  function preparar(t, origem) {
+    const c = JSON.parse(JSON.stringify(t));
+    delete c.pulada;
+    if (origem) c.adiadaDe = origem;
+    return c;
+  }
+  function comIdLivre(lista, t) {
+    if (lista.some(x => x.id === t.id)) t.id = t.id + "-" + Date.now().toString(36);
+    return t;
+  }
+
+  function salvarDepois(novo) {
+    depois = novo; render();
+    fila = fila.then(() => db.doc("listas/depois").set(novo)).catch(() => setStatus("Não consegui salvar agora. Confira a conexão e tente de novo.", true));
+  }
+  function adicionarEm(dest, tarefa) {
+    if (!dest) {
+      const lista = JSON.parse(JSON.stringify(semData()));
+      lista.push(comIdLivre(lista, tarefa));
+      salvarDepois({ tarefas: lista, atualizado: new Date().toISOString() });
+    } else if (dest === atual && doc !== undefined) {
+      mudar(ts => ts.push(comIdLivre(ts, tarefa)), null);
+    } else {
+      const ref = db.doc("dias/" + dest);
+      fila = fila.then(async () => {
+        const s = await ref.get();
+        const d = s.exists ? JSON.parse(JSON.stringify(s.data())) : { data: dest, tarefas: [] };
+        d.tarefas = Array.isArray(d.tarefas) ? d.tarefas : [];
+        d.tarefas.push(comIdLivre(d.tarefas, tarefa));
+        d.data = dest; d.atualizado = new Date().toISOString();
+        await ref.set(d);
+      }).catch(() => setStatus("Não consegui mover agora. Confira a conexão e tente de novo.", true));
+    }
+  }
+  function destinoTexto(dest) { return dest ? (dest === HOJE ? "hoje" : dowData(dest).toLowerCase() + ", " + fmtData(dest)) : "“Para outro dia”"; }
+
+  function moverDoDia(id, dest) {
+    if (!db || !podeEscrever || !doc) return;
+    if (dest === atual) { movendo = null; render(); return; }
+    const t = doc.tarefas.find(x => x.id === id); if (!t) return;
+    const copia = preparar(t, atual);
+    movendo = null; aberto = null;
+    mudar(ts => { const i = ts.findIndex(x => x.id === id); if (i >= 0) ts.splice(i, 1); }, null);
+    adicionarEm(dest, copia);
+    toast("“" + t.titulo + "” foi para " + destinoTexto(dest), null);
+  }
+  function moverDaLista(id, dest) {
+    const lista = JSON.parse(JSON.stringify(semData()));
+    const i = lista.findIndex(x => x.id === id); if (i < 0) return;
+    const [t] = lista.splice(i, 1);
+    movendo = null;
+    salvarDepois({ tarefas: lista, atualizado: new Date().toISOString() });
+    adicionarEm(dest, preparar(t, null));
+    toast("“" + t.titulo + "” foi para " + destinoTexto(dest), null);
+  }
+
+  function resumoEtapas(t) {
+    const es = Array.isArray(t.etapas) ? t.etapas : [];
+    const feitas = es.filter(e => e && e.feito).map(e => e.escolha || e.nome);
+    return feitas.length ? "Já feito: " + feitas.join(", ") : "Nada feito ainda";
+  }
+
+  function renderAbas() {
+    const nSem = semData().length;
+    const nFut = futuros().reduce((s, d) => s + diasDados[d].tarefas.length, 0);
+    $("n-depois").textContent = (nSem + nFut) ? String(nSem + nFut) : "";
+    $("tab-dia").setAttribute("aria-selected", aba === "dia" ? "true" : "false");
+    $("tab-depois").setAttribute("aria-selected", aba === "depois" ? "true" : "false");
+    $("vdia").hidden = aba !== "dia";
+    $("later").hidden = aba !== "depois";
+    if (aba !== "depois") return;
+
+    const L = $("later"); L.innerHTML = "";
+    const h1 = el("h3"); h1.append(el("span", null, "Sem data"), el("span", "ln")); L.append(h1);
+    const lista = semData();
+    if (!lista.length) {
+      const e = el("div", "empty"); e.append(el("strong", null, "Nada guardado"), el("span", null, "No ⋯ de uma tarefa, toque em “Fazer outro dia”. Sem data, ela fica aqui até você escolher quando fazer."));
+      L.append(e);
+    }
+    lista.forEach(t => {
+      const c = el("div", "lcard");
+      c.append(el("div", "title", t.titulo || "Sem nome"));
+      const tags = el("div", "tags");
+      (t.tags || []).forEach(x => tags.append(el("span", "tag", x)));
+      if (t.condicao) tags.append(el("span", "tag cond", t.condicao));
+      if (tags.childElementCount) c.append(tags);
+      c.append(el("div", "meta", (t.adiadaDe ? "Adiada de " + fmtData(t.adiadaDe) + " · " : "") + resumoEtapas(t)));
+      if (podeEscrever && db) {
+        const acts = el("div", "acts");
+        const hoje = el("button", "pri", "Fazer hoje");
+        hoje.addEventListener("click", () => moverDaLista(t.id, HOJE));
+        const data = el("button", null, "Escolher data");
+        data.addEventListener("click", () => { movendo = movendo === "L:" + t.id ? null : "L:" + t.id; render(); });
+        const rem = el("button", "danger", confirmaLater === t.id ? "Toque de novo para remover" : "Remover");
+        rem.addEventListener("click", () => {
+          if (confirmaLater === t.id) {
+            confirmaLater = null;
+            salvarDepois({ tarefas: semData().filter(x => x.id !== t.id), atualizado: new Date().toISOString() });
+            toast("“" + t.titulo + "” removido", null);
+          } else { confirmaLater = t.id; render(); }
+        });
+        acts.append(hoje, data, rem);
+        c.append(acts);
+        if (movendo === "L:" + t.id) {
+          const box = caixaMover(t.titulo, (dest) => { if (dest) moverDaLista(t.id, dest); });
+          const btn = box.querySelector(".row button"); btn.textContent = "Escolha a data";
+          const inp = box.querySelector("input");
+          btn.disabled = true;
+          inp.addEventListener("input", () => { btn.disabled = !inp.value; btn.textContent = inp.value ? "Mover para " + fmtData(inp.value) : "Escolha a data"; });
+          c.append(box);
+        }
+      }
+      L.append(c);
+    });
+
+    const fut = futuros();
+    if (fut.length) {
+      const h2 = el("h3"); h2.append(el("span", null, "Já com data"), el("span", "ln")); L.append(h2);
+      fut.forEach(d => {
+        const ts = diasDados[d].tarefas;
+        const b = el("button", "dayrow");
+        const info = el("span", "dt");
+        info.append(el("b", null, dowData(d) + " · " + ts.length + (ts.length === 1 ? " tarefa" : " tarefas")), el("span", null, ts.map(t => t.titulo).join(" · ")));
+        b.append(el("span", "dd", fmtData(d)), info, el("span", "chev", "›"));
+        b.addEventListener("click", () => { aba = "dia"; abrirDia(d); window.scrollTo({ top: 0, behavior: reduz ? "auto" : "smooth" }); });
+        L.append(b);
+      });
+    }
+  }
+  $("tab-dia").addEventListener("click", () => { aba = "dia"; movendo = null; render(); });
+  $("tab-depois").addEventListener("click", () => { aba = "depois"; movendo = null; confirmaLater = null; render(); });
 
   function cardTarefa(t, ti, st) {
     const li = el("li", "task" + (st === "feita" ? " done" : "") + (st === "pulada" ? " skipped" : ""));
@@ -482,7 +684,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
 
     if (st === "feita" && !expandidos.has(t.id)) {
       const c = el("button", "compact"); c.setAttribute("aria-expanded", "false");
-      const fin = t.etapas[2].escolha === "Programar" ? "Programado" : (praRafa(t) ? "Enviado pra Rafa" : "Enviado");
+      const fin = feitoFinal(t, t.etapas[2].escolha);
       const txt = el("div", "tmain"); txt.append(el("span", "title", t.titulo || "Sem nome"), el("span", "meta", "Concluído · " + fin));
       c.append(el("span", "flag"), txt, el("span", "chev", "▾"));
       c.addEventListener("click", () => { expandidos.add(t.id); render(); });
@@ -499,7 +701,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
     if (t.condicao) tags.append(el("span", "tag cond", t.condicao));
     if (st === "pulada") tags.append(el("span", "tag cond", "Não rolou hoje"));
     const nx = proxima(t);
-    if (st === "pendente" && nx >= 0) { const s = el("span", "tag next"); s.append("Próxima: "); s.append(el("b", null, nx === 2 ? (rotuloEnviar(t) + " ou programar") : t.etapas[nx].nome)); tags.append(s); }
+    if (st === "pendente" && nx >= 0) { const s = el("span", "tag next"); s.append("Próxima: "); s.append(el("b", null, nx === 2 ? (rotuloEnviar(t) + ", programar ou postar") : t.etapas[nx].nome)); tags.append(s); }
     if (tags.childElementCount) main.append(tags);
     head.append(el("span", "num", String(ti + 1).padStart(2, "0")), main);
     if (st === "feita") {
@@ -537,11 +739,11 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
     const fin = el("div", "final" + (ef.feito ? " done" : "") + (!ef.feito && nx === 2 && !t.pulada ? " next" : ""));
     if (ultimoToque && ultimoToque.id === t.id && ultimoToque.i === 2) fin.classList.add("just");
     const fh = el("div", "fh");
-    const dot = el("span", "dot", "3"); fh.append(dot, el("span", null, "Enviar ou programar"));
+    const dot = el("span", "dot", "3"); fh.append(dot, el("span", null, "Enviar, programar ou postar"));
     if (!ef.feito && nx === 2 && !t.pulada) fh.append(el("small", null, "Próxima"));
     fin.append(fh);
-    const seg = el("div", "seg"); seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Enviar ou programar");
-    [["Enviar", rotuloEnviar(t)], ["Programar", "Programar"]].forEach(([val, rot]) => {
+    const seg = el("div", "seg"); seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Enviar, programar ou postar");
+    [["Enviar", rotuloEnviar(t)], ["Programar", "Programar"], ["Postar", "Postar"]].forEach(([val, rot]) => {
       const on = ef.escolha === val;
       const b = el("button", on ? "on" : (ef.escolha ? "off" : ""));
       b.setAttribute("aria-pressed", on ? "true" : "false");
@@ -567,7 +769,11 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
         if (rem.dataset.confirm) { aberto = null; mudar(ts => { const i = ts.findIndex(y => y.id === t.id); if (i >= 0) ts.splice(i, 1); }, "“" + t.titulo + "” removido"); }
         else { rem.dataset.confirm = "1"; rem.textContent = "Toque de novo para remover"; }
       });
-      m.append(pular, rem);
+      const outro = el("button", null, "Fazer outro dia");
+      outro.setAttribute("aria-expanded", movendo === t.id ? "true" : "false");
+      outro.addEventListener("click", () => { movendo = movendo === t.id ? null : t.id; render(); });
+      m.append(outro, pular, rem);
+      if (movendo === t.id) m.append(caixaMover(t.titulo, (dest) => moverDoDia(t.id, dest)));
       body.append(m);
     }
     li.append(body);
@@ -584,7 +790,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
       const e = t.etapas[i];
       if (i === 2) {
         if (e.escolha === escolha) { e.escolha = null; e.feito = false; msg = "Desmarcado: " + t.titulo; }
-        else { e.escolha = escolha; e.feito = true; msg = (escolha === "Programar" ? "Programado" : (praRafa(t) ? "Enviado pra Rafa" : "Enviado")) + " · " + t.titulo; }
+        else { e.escolha = escolha; e.feito = true; msg = feitoFinal(t, escolha) + " · " + t.titulo; }
       } else {
         e.feito = !e.feito;
         msg = (e.feito ? (i === 0 ? "Gravado" : "Editado") : "Desmarcado " + e.nome.toLowerCase()) + " · " + t.titulo;
@@ -626,7 +832,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
   let toastTimer = null, toastBackup = null;
   function toast(msg, backup) {
     toastBackup = backup;
-    $("toast-t").textContent = msg; $("toast").hidden = false;
+    $("toast-t").textContent = msg; $("toast").hidden = false; $("toast-undo").hidden = !backup;
     clearTimeout(toastTimer); toastTimer = setTimeout(() => { $("toast").hidden = true; }, 4200);
   }
   $("toast-undo").addEventListener("click", () => {
@@ -678,6 +884,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
   /* ---------- folha de adicionar ---------- */
   function abrirFolha(v) {
     $("sheet").hidden = !v; $("scrim").hidden = !v;
+    if (v && aba === "depois") { $("add-later").checked = true; $("add-later-wrap").hidden = false; }
     if (v) setTimeout(() => $("add-title").focus(), 50); else $("fab").focus();
   }
   $("fab").addEventListener("click", () => abrirFolha(true));
@@ -685,6 +892,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
   $("add-cancel").addEventListener("click", () => abrirFolha(false));
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") { if (!$("sheet").hidden) abrirFolha(false); if (!$("finish").hidden) $("finish").hidden = true; } });
   $("add-cond").addEventListener("change", () => { $("add-cond-wrap").hidden = !$("add-cond").checked; });
+  $("add-later").addEventListener("change", () => { $("add-later-wrap").hidden = !$("add-later").checked; });
+  $("add-date").min = HOJE;
   $("addform").addEventListener("submit", (ev) => {
     ev.preventDefault();
     const titulo = $("add-title").value.trim(); if (!titulo) return;
@@ -692,8 +901,16 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
     const nova = { id: "t" + Date.now().toString(36), titulo, tags: tag ? tag.split(/\s*,\s*/).filter(Boolean) : [],
       etapas: [{ nome: "Gravar", feito: false }, { nome: "Editar", feito: false }, etapaFinal(null)] };
     if ($("add-cond").checked) nova.condicao = $("add-cond-txt").value.trim() || "Depende de alguém aparecer";
-    mudar(ts => ts.push(nova), "Adicionado: " + titulo);
+    const outroDia = $("add-later").checked || aba === "depois";
+    if (outroDia) {
+      const dest = $("add-date").value || null;
+      adicionarEm(dest, nova);
+      toast("“" + titulo + "” guardado para " + destinoTexto(dest), null);
+    } else {
+      mudar(ts => ts.push(nova), "Adicionado: " + titulo);
+    }
     $("add-title").value = ""; $("add-tag").value = ""; $("add-cond").checked = false; $("add-cond-txt").value = ""; $("add-cond-wrap").hidden = true;
+    $("add-later").checked = false; $("add-date").value = ""; $("add-later-wrap").hidden = true;
     abrirFolha(false);
   });
 
@@ -724,7 +941,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
       const pode = user && user.can ? await user.can("data.write") : null;
       if (pode === false) podeEscrever = false;
     } catch (e) {}
-    db.collection("dias").onSnapshot(snap => { dias = snap.docs.map(d => d.id).sort(); render(); }, () => {});
+    db.collection("dias").onSnapshot(snap => {
+      dias = snap.docs.map(d => d.id).sort();
+      diasDados = {}; snap.docs.forEach(d => { const v = d.data(); if (v) diasDados[d.id] = v; });
+      render();
+    }, () => {});
+    db.doc("listas/depois").onSnapshot(snap => { depois = snap.exists ? snap.data() : { tarefas: [] }; render(); }, () => {});
     abrirDia(HOJE);
   })();
 })();
