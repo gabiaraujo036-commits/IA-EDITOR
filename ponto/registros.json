@@ -40,6 +40,13 @@
   },
   "2026-11-12": {
     "chegada": "08:50",
-    "saida_almoco": "15:10"
+    "saida_almoco": "15:10",
+    "anotacoes": [
+      {
+        "tipo": "Almoço interrompido",
+        "texto": "Interrompeu o almoço para gravar test drive de um cliente; cerca de 20 min de gravação (aproximado). Voltou a comer por volta das 15:50",
+        "registrado_em": "2026-11-12 15:50"
+      }
+    ]
   }
 }
