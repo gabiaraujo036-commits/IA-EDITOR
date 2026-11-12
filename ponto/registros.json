@@ -46,7 +46,13 @@
         "tipo": "Almoço interrompido",
         "texto": "Interrompeu o almoço para gravar test drive de um cliente; cerca de 20 min de gravação (aproximado). Voltou a comer por volta das 15:50",
         "registrado_em": "2026-11-12 15:50"
+      },
+      {
+        "tipo": "Almoço interrompido",
+        "texto": "Voltou do almoço às 15:58. Dentro do intervalo (15:10–15:58) houve ~20 min de gravação (aproximado), então o almoço real foi de ~28 min",
+        "registrado_em": "2026-11-12 15:58"
       }
-    ]
+    ],
+    "volta_almoco": "15:58"
   }
 }
