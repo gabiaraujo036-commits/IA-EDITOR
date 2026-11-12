@@ -1,118 +1,236 @@
 <title>Pauta do Dia</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: uma "pauta de gravação" em coluna única — cabeçalho com data e progresso, cada vídeo é uma linha com as etapas em sequência (tocar = feito). */
+/* Layout: painel de carro em vermelho escuro no topo (conta-giros com o progresso do dia + 3 instrumentos por etapa),
+   faixa quadriculada de largada, e embaixo a pauta: um card por vídeo com Gravar, Editar e Enviar/Programar. */
 :root {
-  --bg: #f3f4f1;
-  --surface: #ffffff;
-  --ink: #1b1f1d;
-  --muted: #5f6762;
-  --line: #dcdfda;
-  --accent: #0f7a5c;      /* verde "pista liberada" */
-  --accent-ink: #ffffff;
-  --accent-soft: #dcefe7;
-  --amber: #b26a00;       /* condicional / depende de alguém */
-  --amber-soft: #f8ead2;
-  --skip: #8a8f8b;
-  --f-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --paper: #f6f1f0;
+  --card: #ffffff;
+  --ink: #1e1416;
+  --muted: #6e5f61;
+  --line: #e7dbdc;
+  --red: #d0142c;
+  --red-ink: #ffffff;
+  --red-soft: #fbe4e6;
+  --red-text: #9e0f20;
+  --amber: #9a5200;
+  --amber-soft: #f8e8d0;
+  --panel-a: #2a0a10;
+  --panel-b: #520e1a;
+  --panel-ink: #fff4f4;
+  --panel-muted: #e3b3b8;
+  --panel-track: rgba(255, 255, 255, .14);
+  --panel-hot: #ff4357;
+  --shadow: 0 1px 2px rgba(60, 10, 18, .06), 0 6px 18px rgba(60, 10, 18, .06);
+  --f-display: "Saira Condensed", "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
   --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #141716; --surface: #1c201e; --ink: #ebeeec; --muted: #9aa39e; --line: #2e3431;
-    --accent: #3fc79a; --accent-ink: #0d1a15; --accent-soft: #1d3a30;
-    --amber: #f0b453; --amber-soft: #3a2f1c; --skip: #6f7672;
+    --paper: #130b0c; --card: #1e1315; --ink: #f6ebec; --muted: #b59ca0; --line: #3a2a2d;
+    --red: #e3243a; --red-ink: #ffffff; --red-soft: #3b1419; --red-text: #ff9aa4;
+    --amber: #f2b45a; --amber-soft: #3a2a14;
+    --panel-a: #0d0506; --panel-b: #3b0911; --panel-ink: #fff4f4; --panel-muted: #d8a3a9;
+    --panel-track: rgba(255, 255, 255, .12); --panel-hot: #ff5466;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #141716; --surface: #1c201e; --ink: #ebeeec; --muted: #9aa39e; --line: #2e3431;
-  --accent: #3fc79a; --accent-ink: #0d1a15; --accent-soft: #1d3a30;
-  --amber: #f0b453; --amber-soft: #3a2f1c; --skip: #6f7672;
+  --paper: #130b0c; --card: #1e1315; --ink: #f6ebec; --muted: #b59ca0; --line: #3a2a2d;
+  --red: #e3243a; --red-ink: #ffffff; --red-soft: #3b1419; --red-text: #ff9aa4;
+  --amber: #f2b45a; --amber-soft: #3a2a14;
+  --panel-a: #0d0506; --panel-b: #3b0911; --panel-ink: #fff4f4; --panel-muted: #d8a3a9;
+  --panel-track: rgba(255, 255, 255, .12); --panel-hot: #ff5466;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4);
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; }
-.wrap { max-width: 720px; margin: 0 auto; padding-block: 20px 48px;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  display: flex; flex-direction: column; gap: 20px; }
+[hidden] { display: none !important; }
+body { background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; -webkit-tap-highlight-color: transparent; }
+button { font-family: inherit; color: inherit; }
+.gut { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.inner { max-width: 760px; margin: 0 auto; }
 
-header { display: flex; flex-direction: column; gap: 14px; }
+/* ---------- painel ---------- */
+.panel { background: radial-gradient(120% 140% at 50% 0%, var(--panel-b) 0%, var(--panel-a) 70%); color: var(--panel-ink); }
+.panel .inner { padding-block: 18px 22px; display: flex; flex-direction: column; gap: 14px; }
 .topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--panel-muted); }
 .daynav { display: flex; gap: 6px; }
-.daynav button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 18px; cursor: pointer; }
-.daynav button:disabled { opacity: .35; cursor: default; }
-h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(34px, 8vw, 52px); line-height: .95; margin: 0; text-transform: uppercase; letter-spacing: .01em; text-wrap: balance; }
-h1 .dow { color: var(--accent); }
+.daynav button { width: 38px; height: 38px; border-radius: 12px; border: 1px solid var(--panel-track); background: rgba(255,255,255,.06); color: var(--panel-ink); font-size: 20px; line-height: 1; cursor: pointer; }
+.daynav button:disabled { opacity: .3; cursor: default; }
+h1 { font-family: var(--f-display); font-weight: 800; font-size: clamp(36px, 9vw, 56px); line-height: .9; margin: 0; text-transform: uppercase; letter-spacing: .01em; text-wrap: balance; }
+h1 .d { color: var(--panel-hot); }
 
-.progress { display: flex; flex-direction: column; gap: 8px; }
-.progress .nums { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-variant-numeric: tabular-nums; }
-.progress .big { font-family: var(--f-display); font-weight: 700; font-size: 26px; }
-.progress .small { color: var(--muted); font-size: 13px; }
-.bar { height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; }
-.bar > i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width .35s ease; }
+.dash { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 18px; align-items: center; }
+.gauge { position: relative; width: 100%; max-width: 260px; margin: 0 auto; }
+.gauge svg { display: block; width: 100%; height: auto; overflow: visible; }
+.g-track { fill: none; stroke: var(--panel-track); stroke-width: 14; stroke-linecap: round; }
+.g-red { fill: none; stroke: var(--panel-hot); stroke-width: 14; stroke-linecap: butt; opacity: .28; }
+.g-fill { fill: none; stroke: var(--panel-hot); stroke-width: 14; stroke-linecap: round; stroke-dasharray: 100 100; stroke-dashoffset: 100; transition: stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1); filter: drop-shadow(0 0 6px rgba(255, 67, 87, .55)); }
+.g-tick { stroke: var(--panel-muted); stroke-width: 2; opacity: .55; }
+.g-tick.big { stroke-width: 3; opacity: .9; }
+.g-lbl { fill: var(--panel-muted); font: 600 11px var(--f-display); text-anchor: middle; }
+.needle { transform-box: view-box; transform-origin: 120px 120px; transition: transform .9s cubic-bezier(.3,1.4,.4,1); }
+.needle line { stroke: var(--panel-ink); stroke-width: 3; stroke-linecap: round; }
+.hub { fill: var(--panel-hot); stroke: var(--panel-ink); stroke-width: 2.5; }
+.g-read { position: absolute; left: 0; right: 0; top: 74%; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0; }
+.g-pct { font-family: var(--f-display); font-weight: 800; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+.g-pct small { font-size: 20px; color: var(--panel-muted); margin-left: 1px; }
+.g-sub { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--panel-muted); }
 
+.instr { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.ins { background: rgba(255,255,255,.06); border: 1px solid var(--panel-track); border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 7px; }
+.ins .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ins .k { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--panel-muted); }
+.ins .v { font-family: var(--f-display); font-weight: 700; font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums; }
+.ins .v small { color: var(--panel-muted); font-size: 15px; }
+.leds { display: flex; gap: 3px; }
+.leds i { flex: 1; height: 6px; border-radius: 2px; background: var(--panel-track); transition: background .3s, box-shadow .3s; }
+.leds i.on { background: var(--panel-hot); box-shadow: 0 0 6px rgba(255, 67, 87, .6); }
+.faltam { font-size: 14px; color: var(--panel-muted); }
+.faltam b { color: var(--panel-ink); font-weight: 700; }
+
+.checker { height: 12px; background-color: var(--panel-a); background-image: repeating-conic-gradient(var(--panel-ink) 0 25%, transparent 0 50%); background-size: 12px 12px; opacity: .95; }
+
+/* ---------- pauta ---------- */
+.wrap { padding-block: 18px 110px; }
+.wrap .inner { display: flex; flex-direction: column; gap: 14px; }
 .filters { display: flex; gap: 6px; flex-wrap: wrap; }
-.filters button { font: 500 13px var(--f-body); padding: 7px 12px; border-radius: 99px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; }
-.filters button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-
+.filters button { font-size: 13px; font-weight: 600; padding: 8px 13px; border-radius: 99px; border: 1px solid var(--line); background: var(--card); color: var(--muted); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.filters button span { font-variant-numeric: tabular-nums; opacity: .8; }
+.filters button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .status { font-size: 13px; color: var(--muted); }
 .status.warn { color: var(--amber); }
 
-ol.tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.task { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 10px; }
-.task.done { background: transparent; }
-.task.done .title { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 2px; }
-.task.skipped { opacity: .55; }
-.task.skipped .title { text-decoration: line-through; }
+ol.tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.task { background: var(--card); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; }
+.strip { display: flex; gap: 3px; padding: 0; height: 5px; }
+.strip i { flex: 1; background: var(--line); transition: background .4s; }
+.strip i.on { background: var(--red); }
+.tbody { padding: 14px 14px 14px; display: flex; flex-direction: column; gap: 12px; }
 .thead { display: flex; align-items: flex-start; gap: 10px; }
-.num { font-family: var(--f-mono); font-size: 12px; color: var(--muted); padding-top: 4px; min-width: 22px; font-variant-numeric: tabular-nums; }
-.tmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.title { font-family: var(--f-display); font-weight: 700; font-size: 22px; line-height: 1.1; text-transform: uppercase; letter-spacing: .01em; overflow-wrap: anywhere; }
+.num { font-family: var(--f-display); font-weight: 700; font-size: 15px; color: var(--muted); padding-top: 3px; min-width: 22px; font-variant-numeric: tabular-nums; }
+.tmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.title { font-family: var(--f-display); font-weight: 700; font-size: 24px; line-height: 1.05; text-transform: uppercase; letter-spacing: .01em; overflow-wrap: anywhere; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.tag { font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 6px; background: var(--accent-soft); color: var(--ink); }
+.tag { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: var(--red-soft); color: var(--red-text); }
 .tag.cond { background: var(--amber-soft); color: var(--amber); }
-.tag.ok { background: var(--accent); color: var(--accent-ink); }
-.more { border: 0; background: transparent; color: var(--muted); font-size: 20px; line-height: 1; padding: 2px 6px; cursor: pointer; border-radius: 8px; }
+.tag.next { background: transparent; color: var(--muted); padding-left: 0; font-weight: 500; }
+.tag.next b { color: var(--ink); }
+.more { border: 0; background: transparent; color: var(--muted); font-size: 22px; line-height: 1; width: 36px; height: 36px; cursor: pointer; border-radius: 10px; flex: none; }
+.more:hover { background: var(--paper); }
 
-.steps { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding-left: 32px; }
-.steps .arrow { color: var(--line); font-size: 14px; }
-.step { display: inline-flex; align-items: center; gap: 7px; font: 600 14px var(--f-body); padding: 8px 12px 8px 9px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; transition: background .15s, border-color .15s; min-height: 40px; }
-.step .box { width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--muted); display: grid; place-items: center; flex: none; }
-.step[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.step[aria-pressed="true"] .box { border-color: var(--accent-ink); background: var(--accent-ink); }
-.step[aria-pressed="true"] .box::after { content: ""; width: 9px; height: 5px; border-left: 2.5px solid var(--accent); border-bottom: 2.5px solid var(--accent); transform: rotate(-45deg) translate(1px,-1px); }
-.step:disabled { cursor: default; }
+.steps { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.step { position: relative; display: flex; align-items: center; gap: 10px; padding: 10px 12px; min-height: 52px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--paper); cursor: pointer; text-align: left; font-size: 15px; font-weight: 600; transition: border-color .2s, background .2s, transform .12s; }
+.step:active { transform: scale(.97); }
+.dot { position: relative; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--muted); display: grid; place-items: center; flex: none; font: 700 13px var(--f-display); color: var(--muted); transition: background .25s, border-color .25s; }
+.step .lbl { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.step .lbl small { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--red-text); }
+.step.next { border-color: var(--red); }
+.step.next .dot { border-color: var(--red); color: var(--red); }
+.step.next .dot::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--red); opacity: 0; animation: ping 1.8s ease-out infinite; }
+.step.done { background: var(--red); border-color: var(--red); color: var(--red-ink); }
+.step.done .dot { background: var(--red-ink); border-color: var(--red-ink); color: transparent; }
+.check { position: absolute; inset: 0; display: grid; place-items: center; }
+.check svg { width: 16px; height: 16px; }
+.check path { fill: none; stroke: var(--red); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 0; }
+.just .check path { animation: draw .35s ease-out both; }
+.just.step, .just .seg button.on { animation: pop .38s cubic-bezier(.3,1.6,.5,1); }
 
-.menu { display: flex; flex-wrap: wrap; gap: 6px; padding-left: 32px; }
-.menu button { font: 500 13px var(--f-body); padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
-.menu button.danger { color: #c0392b; border-color: currentColor; }
+.final { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--paper); transition: border-color .2s; }
+.final.next { border-color: var(--red); }
+.final.done { border-color: var(--red); }
+.final .fh { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
+.final .fh .dot { width: 24px; height: 24px; font-size: 12px; }
+.final.next .fh .dot { border-color: var(--red); color: var(--red); }
+.final.done .fh .dot { background: var(--red); border-color: var(--red); color: var(--red-ink); }
+.final .fh small { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--red-text); margin-left: auto; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.seg button { min-height: 46px; border-radius: 11px; border: 1.5px solid var(--line); background: var(--card); font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 8px; transition: background .2s, border-color .2s, opacity .2s, transform .12s; }
+.seg button:active { transform: scale(.97); }
+.seg button.on { background: var(--red); border-color: var(--red); color: var(--red-ink); }
+.seg button.off { opacity: .45; }
+.seg button svg { width: 14px; height: 14px; }
+.seg button svg path { fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
 
-.empty { border: 1.5px dashed var(--line); border-radius: 14px; padding: 22px 18px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
-.empty strong { color: var(--ink); font-family: var(--f-display); font-size: 22px; text-transform: uppercase; }
+.task button:disabled { cursor: default; }
+.task.skipped { opacity: .6; }
+.task.skipped .title { text-decoration: line-through; }
+.task.done .title { color: var(--muted); }
+.compact { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 0; background: transparent; width: 100%; text-align: left; cursor: pointer; }
+.compact .title { font-size: 20px; color: var(--muted); }
+.flag { width: 28px; height: 28px; border-radius: 8px; flex: none; background-color: var(--card); background-image: repeating-conic-gradient(var(--ink) 0 25%, transparent 0 50%); background-size: 10px 10px; border: 2px solid var(--ink); }
+.compact .meta { font-size: 13px; color: var(--muted); }
+.compact .chev { margin-left: auto; color: var(--muted); font-size: 18px; }
 
-details.add { border-top: 1px solid var(--line); padding-top: 14px; }
-details.add summary { cursor: pointer; font-weight: 600; color: var(--accent); list-style: none; }
-details.add summary::-webkit-details-marker { display: none; }
-form.addform { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
-form.addform label.f { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
-form.addform input[type="text"] { font: 15px var(--f-body); padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); width: 100%; }
-.pick { display: flex; flex-wrap: wrap; gap: 6px; }
-.pick label { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); cursor: pointer; }
-form.addform button[type="submit"] { align-self: flex-start; font: 600 14px var(--f-body); padding: 10px 16px; border-radius: 10px; border: 0; background: var(--accent); color: var(--accent-ink); cursor: pointer; }
+.menu { display: flex; flex-wrap: wrap; gap: 6px; }
+.menu button { font-size: 13px; font-weight: 600; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--paper); cursor: pointer; }
+.menu button.danger { color: var(--red-text); border-color: var(--red); }
 
-button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.empty { border: 1.5px dashed var(--line); border-radius: 18px; padding: 24px 18px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+.empty strong { color: var(--ink); font-family: var(--f-display); font-size: 24px; text-transform: uppercase; }
 .foot { font-size: 12px; color: var(--muted); }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-@media (max-width: 420px) { .steps, .menu { padding-left: 0; } }
+
+/* ---------- botão + e folha de adicionar ---------- */
+.fab { position: fixed; right: max(18px, calc(env(safe-area-inset-right, 0px) + 18px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); z-index: 20; height: 56px; padding: 0 20px 0 16px; border-radius: 28px; border: 0; background: var(--red); color: var(--red-ink); font-size: 15px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 8px 24px rgba(208, 20, 44, .35); }
+.fab b { font-size: 26px; line-height: 1; font-weight: 500; }
+.scrim { position: fixed; inset: 0; background: rgba(20, 5, 8, .45); z-index: 30; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 31; background: var(--card); border-radius: 22px 22px 0 0; padding-block: 18px calc(env(safe-area-inset-bottom, 0px) + 18px); animation: up .28s cubic-bezier(.2,.8,.2,1); }
+.sheet .inner { display: flex; flex-direction: column; gap: 12px; max-width: 560px; }
+.sheet h2 { font-family: var(--f-display); font-weight: 800; font-size: 28px; text-transform: uppercase; margin: 0; }
+.sheet p.hint { margin: 0; font-size: 13px; color: var(--muted); }
+.sheet label.f { display: flex; flex-direction: column; gap: 5px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.sheet input[type="text"] { font: 16px var(--f-body); padding: 12px 13px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); width: 100%; }
+.sheet input[type="text"]:focus { border-color: var(--red); outline: none; }
+.sheet .cb { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 500; color: var(--ink); cursor: pointer; }
+.sheet .cb input { width: 20px; height: 20px; accent-color: var(--red); }
+.sheet .acts { display: flex; gap: 8px; }
+.sheet .acts button { flex: 1; min-height: 48px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--line); background: transparent; }
+.sheet .acts button[type="submit"] { background: var(--red); border-color: var(--red); color: var(--red-ink); }
+
+/* ---------- toast e celebração ---------- */
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 86px); transform: translateX(-50%); z-index: 40; width: min(440px, calc(100% - 32px)); background: var(--ink); color: var(--paper); border-radius: 14px; padding: 11px 12px 11px 16px; display: flex; align-items: center; gap: 12px; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.25); animation: up .25s ease-out; }
+.toast span { flex: 1; min-width: 0; }
+.toast button { border: 0; background: transparent; color: var(--panel-hot); font-weight: 700; font-size: 14px; cursor: pointer; padding: 6px 8px; border-radius: 8px; }
+canvas#fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 45; }
+.finish { position: fixed; inset: 0; z-index: 44; display: grid; place-items: center; background: rgba(20, 5, 8, .55); padding: 24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px)); }
+.finish .card { width: min(420px, 100%); background: var(--card); border-radius: 22px; overflow: hidden; text-align: center; animation: pop .45s cubic-bezier(.3,1.5,.5,1); }
+.finish .band { height: 34px; background-color: var(--card); background-image: repeating-conic-gradient(var(--ink) 0 25%, transparent 0 50%); background-size: 17px 17px; }
+.finish .c { padding: 22px 20px 20px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.finish h2 { margin: 0; font-family: var(--f-display); font-weight: 800; font-size: 40px; line-height: .95; text-transform: uppercase; color: var(--red); }
+.finish p { margin: 0; color: var(--muted); }
+.finish button { margin-top: 6px; min-height: 48px; padding: 0 26px; border-radius: 12px; border: 0; background: var(--red); color: var(--red-ink); font-weight: 700; font-size: 15px; cursor: pointer; }
+
+@keyframes ping { 0% { transform: scale(.7); opacity: .8; } 100% { transform: scale(1.35); opacity: 0; } }
+@keyframes draw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
+@keyframes pop { 0% { transform: scale(.92); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+@keyframes up { from { transform: translate(var(--tx, 0), 24px); opacity: 0; } to { transform: translate(var(--tx, 0), 0); opacity: 1; } }
+.toast { --tx: -50%; }
+
+button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.panel button:focus-visible { outline-color: var(--panel-ink); }
+
+@media (max-width: 560px) {
+  .dash { grid-template-columns: 1fr; gap: 12px; }
+  .gauge { max-width: 240px; }
+  .instr { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .ins { padding: 8px 9px; }
+  .ins .k { font-size: 10px; letter-spacing: .06em; }
+  .ins .v { font-size: 20px; }
+  .faltam { text-align: center; }
+}
+@media (max-width: 360px) { .steps { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
 </style>
 
-<div class="wrap">
-  <header>
+<header class="panel">
+  <div class="inner gut">
     <div class="topline">
       <span class="eyebrow" id="eyebrow">Pauta de gravação</span>
       <div class="daynav">
@@ -120,186 +238,384 @@ button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px 
         <button id="next" aria-label="Próximo dia" disabled>›</button>
       </div>
     </div>
-    <h1 id="title"><span class="dow">Hoje</span></h1>
-    <div class="progress" aria-live="polite">
-      <div class="nums"><span class="big" id="pbig">–</span><span class="small" id="psmall">carregando a pauta…</span></div>
-      <div class="bar"><i id="pbar"></i></div>
+    <h1 id="title"><span class="d">Hoje</span></h1>
+    <div class="dash">
+      <div class="gauge" aria-hidden="true">
+        <svg viewBox="0 0 240 170" id="gsvg">
+          <g id="ticks"></g>
+          <path class="g-track" id="arc" pathLength="100"></path>
+          <path class="g-red" id="arcRed"></path>
+          <path class="g-fill" id="arcFill" pathLength="100"></path>
+          <g class="needle" id="needle"><line x1="120" y1="120" x2="190" y2="120"></line></g>
+          <circle class="hub" cx="120" cy="120" r="8"></circle>
+        </svg>
+        <div class="g-read"><span class="g-pct" id="gpct">0<small>%</small></span><span class="g-sub" id="gsub">da pauta</span></div>
+      </div>
+      <div class="instr" id="instr">
+        <div class="ins" data-k="0"><div class="row"><span class="k">Gravados</span><span class="v">–</span></div><div class="leds"></div></div>
+        <div class="ins" data-k="1"><div class="row"><span class="k">Editados</span><span class="v">–</span></div><div class="leds"></div></div>
+        <div class="ins" data-k="2"><div class="row"><span class="k">Enviados</span><span class="v">–</span></div><div class="leds"></div></div>
+      </div>
     </div>
+    <div class="faltam" id="faltam" aria-live="polite">Carregando a pauta…</div>
+  </div>
+  <div class="checker" aria-hidden="true"></div>
+</header>
+
+<main class="wrap gut">
+  <div class="inner">
     <div class="filters" role="group" aria-label="Filtro">
-      <button data-f="todas" aria-pressed="true">Todas</button>
-      <button data-f="pendentes" aria-pressed="false">Pendentes</button>
-      <button data-f="feitas" aria-pressed="false">Feitas</button>
+      <button data-f="todas" aria-pressed="true">Todas <span id="c-todas"></span></button>
+      <button data-f="pendentes" aria-pressed="false">Pendentes <span id="c-pendentes"></span></button>
+      <button data-f="feitas" aria-pressed="false">Feitas <span id="c-feitas"></span></button>
     </div>
     <div class="status" id="status" hidden></div>
-  </header>
-
-  <ol class="tasks" id="tasks"></ol>
-  <div class="empty" id="empty" hidden>
-    <strong>Nenhuma pauta para este dia</strong>
-    <span>Mande no chat o que vai gravar, editar ou postar e a lista aparece aqui. Também dá para adicionar abaixo.</span>
+    <ol class="tasks" id="tasks"></ol>
+    <div class="empty" id="empty" hidden>
+      <strong>Nenhuma pauta para este dia</strong>
+      <span>Mande no chat o que vai gravar e editar, ou toque em “Nova tarefa”.</span>
+    </div>
+    <p class="foot">Toque numa etapa para marcar. No fim, escolha se o vídeo foi enviado ou programado. Tudo fica salvo e o Claude acompanha.</p>
   </div>
+</main>
 
-  <details class="add" id="addbox">
-    <summary>+ Adicionar tarefa neste dia</summary>
-    <form class="addform" id="addform">
-      <label class="f">O que é
-        <input type="text" id="add-title" placeholder="Ex.: Vídeo do Onix" required>
-      </label>
-      <label class="f">Com quem / observação (opcional)
-        <input type="text" id="add-tag" placeholder="Ex.: com o Otávio">
-      </label>
-      <div class="f" style="font-size:13px;color:var(--muted)">Etapas
-        <div class="pick" id="add-steps"></div>
-      </div>
+<button class="fab" id="fab" hidden><b>+</b> Nova tarefa</button>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-h">
+  <form class="inner gut" id="addform">
+    <h2 id="sheet-h">Nova tarefa</h2>
+    <p class="hint">Entra com as três etapas: Gravar, Editar e Enviar ou programar.</p>
+    <label class="f">O que é
+      <input type="text" id="add-title" placeholder="Ex.: Vídeo do Onix" autocomplete="off" required>
+    </label>
+    <label class="f">Com quem / observação (opcional)
+      <input type="text" id="add-tag" placeholder="Ex.: com o Otávio, pra Rafa" autocomplete="off">
+    </label>
+    <label class="cb"><input type="checkbox" id="add-cond"> Depende de alguém aparecer</label>
+    <label class="f" id="add-cond-wrap" hidden>Depende de quem?
+      <input type="text" id="add-cond-txt" placeholder="Ex.: Se o Mário aparecer" autocomplete="off">
+    </label>
+    <div class="acts">
+      <button type="button" id="add-cancel">Cancelar</button>
       <button type="submit">Adicionar</button>
-    </form>
-  </details>
-
-  <p class="foot">Toque numa etapa para marcar como feita. Tudo fica salvo e o Claude consegue ler o que já foi feito.</p>
+    </div>
+  </form>
 </div>
+
+<div class="finish" id="finish" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="fin-h">
+    <div class="band"></div>
+    <div class="c">
+      <h2 id="fin-h">Pauta fechada!</h2>
+      <p id="fin-p">Todos os vídeos do dia passaram pela bandeirada.</p>
+      <button id="fin-ok">Fechar</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden role="status"><span id="toast-t"></span><button id="toast-undo">Desfazer</button></div>
+<canvas id="fx" hidden></canvas>
 
 <script>
 (function () {
-  const ETAPAS = ["Gravar", "Fotografar", "Editar", "Mandar pra Rafa", "Postar", "Jogar no Garagem"];
   const DOW = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
   const MES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
   const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const reduz = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; } })();
+  const CHECK = '<svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg>';
 
   function hojeSP() {
-    try {
-      const p = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-      return p;
-    } catch (e) { return new Date().toISOString().slice(0, 10); }
+    try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()); }
+    catch (e) { return new Date().toISOString().slice(0, 10); }
   }
   const HOJE = hojeSP();
 
-  let db = null, dias = [], atual = HOJE, doc = null, unsubDoc = null, filtro = "todas", aberto = null;
-  let podeEscrever = true, fila = Promise.resolve();
+  let db = null, dias = [], atual = HOJE, doc = undefined, unsubDoc = null, filtro = "todas", aberto = null;
+  let podeEscrever = true, fila = Promise.resolve(), dbPronto = false, ultimoToque = null;
+  const expandidos = new Set();
   try { const f = localStorage.getItem("pauta-filtro"); if (f) filtro = f; } catch (e) {}
 
-  // etapas no formulário
-  ETAPAS.forEach((e, i) => {
-    const l = document.createElement("label");
-    const c = document.createElement("input");
-    c.type = "checkbox"; c.value = e; c.id = "add-step-" + i;
-    if (e === "Gravar" || e === "Editar") c.checked = true;
-    l.append(c, document.createTextNode(e));
-    $("add-steps").append(l);
-  });
-
-  function setStatus(msg, warn) {
-    const s = $("status");
-    s.hidden = !msg; s.textContent = msg || ""; s.classList.toggle("warn", !!warn);
+  /* ---------- modelo ---------- */
+  function etapaFinal(escolha) {
+    return { nome: "Enviar ou programar", opcoes: ["Enviar", "Programar"], escolha: escolha || null, feito: !!escolha };
   }
+  function normalizar(t) {
+    const es = Array.isArray(t.etapas) ? t.etapas : [];
+    if (es.length === 3 && es[2] && Array.isArray(es[2].opcoes)) return t;
+    const achar = (n) => es.find(e => e && e.nome === n);
+    const g = achar("Gravar"), ed = achar("Editar");
+    const env = es.find(e => e && /mandar|enviar|postar|programar/i.test(e.nome || ""));
+    const esc = env && env.feito ? (/program/i.test(env.nome) ? "Programar" : "Enviar") : null;
+    return Object.assign({}, t, { etapas: [ { nome: "Gravar", feito: !!(g && g.feito) }, { nome: "Editar", feito: !!(ed && ed.feito) }, etapaFinal(esc) ] });
+  }
+  function normDoc(d) {
+    if (!d) return d;
+    return Object.assign({}, d, { tarefas: (Array.isArray(d.tarefas) ? d.tarefas : []).map(normalizar) });
+  }
+  function estado(t) {
+    if (t.pulada) return "pulada";
+    return t.etapas.every(e => e.feito) ? "feita" : "pendente";
+  }
+  function proxima(t) { return t.etapas.findIndex(e => !e.feito); }
+  function praRafa(t) { return (t.tags || []).some(x => /rafa/i.test(x)); }
+  function rotuloEnviar(t) { return praRafa(t) ? "Enviar pra Rafa" : "Enviar"; }
+  function nomeEtapa(t, i) { return i === 2 ? "Enviar ou programar" : t.etapas[i].nome; }
+  function resumo(ts) {
+    let total = 0, feitas = 0, vids = 0, vFeitos = 0; const por = [0, 0, 0];
+    ts.forEach(t => {
+      if (t.pulada) return;
+      vids++; if (estado(t) === "feita") vFeitos++;
+      t.etapas.forEach((e, i) => { total++; if (e.feito) { feitas++; por[i]++; } });
+    });
+    return { total, feitas, vids, vFeitos, por };
+  }
+
+  /* ---------- conta-giros ---------- */
+  const CX = 120, CY = 120, R = 92, A0 = 150, SW = 240;
+  const pt = (a, r) => [CX + r * Math.cos(a * Math.PI / 180), CY + r * Math.sin(a * Math.PI / 180)];
+  function arco(a1, a2, r) {
+    const p1 = pt(a1, r), p2 = pt(a2, r), large = (a2 - a1) > 180 ? 1 : 0;
+    return "M" + p1[0].toFixed(2) + " " + p1[1].toFixed(2) + " A" + r + " " + r + " 0 " + large + " 1 " + p2[0].toFixed(2) + " " + p2[1].toFixed(2);
+  }
+  $("arc").setAttribute("d", arco(A0, A0 + SW, R));
+  $("arcFill").setAttribute("d", arco(A0, A0 + SW, R));
+  $("arcRed").setAttribute("d", arco(A0 + SW * 0.8, A0 + SW, R));
+  (function ticks() {
+    const g = $("ticks");
+    for (let i = 0; i <= 20; i++) {
+      const a = A0 + SW * i / 20, big = i % 5 === 0;
+      const p1 = pt(a, R - 14), p2 = pt(a, R - (big ? 26 : 20));
+      const l = document.createElementNS(NS, "line");
+      l.setAttribute("x1", p1[0]); l.setAttribute("y1", p1[1]); l.setAttribute("x2", p2[0]); l.setAttribute("y2", p2[1]);
+      l.setAttribute("class", "g-tick" + (big ? " big" : ""));
+      g.append(l);
+      if (big) {
+        const p = pt(a, R + 16), tx = document.createElementNS(NS, "text");
+        tx.setAttribute("x", p[0]); tx.setAttribute("y", p[1] + 4); tx.setAttribute("class", "g-lbl");
+        tx.textContent = String(i * 5); g.append(tx);
+      }
+    }
+  })();
+  let pctMostrado = 0, animPct = null;
+  function setGauge(pct) {
+    $("arcFill").style.strokeDashoffset = String(100 - pct);
+    $("needle").style.transform = "rotate(" + (A0 + SW * pct / 100) + "deg)";
+    const de = pctMostrado, para = Math.round(pct);
+    if (animPct) cancelAnimationFrame(animPct);
+    const escreve = (v) => { $("gpct").innerHTML = ""; $("gpct").append(String(v)); const s = document.createElement("small"); s.textContent = "%"; $("gpct").append(s); };
+    if (reduz || de === para) { pctMostrado = para; escreve(para); return; }
+    const t0 = performance.now(), dur = 800;
+    const passo = (now) => {
+      const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      escreve(Math.round(de + (para - de) * e));
+      if (k < 1) animPct = requestAnimationFrame(passo); else { pctMostrado = para; animPct = null; }
+    };
+    animPct = requestAnimationFrame(passo);
+  }
+
+  /* ---------- render ---------- */
+  function setStatus(msg, warn) { const s = $("status"); s.hidden = !msg; s.textContent = msg || ""; s.classList.toggle("warn", !!warn); }
 
   function tituloData(iso) {
     const [y, m, d] = iso.split("-").map(Number);
     const dt = new Date(Date.UTC(y, m - 1, d, 12));
-    const dow = DOW[dt.getUTCDay()];
-    const rel = iso === HOJE ? "Hoje · " : "";
-    $("eyebrow").textContent = rel + d + " de " + MES[m - 1] + " de " + y;
+    $("eyebrow").textContent = (iso === HOJE ? "Hoje · " : "") + d + " de " + MES[m - 1] + " de " + y;
     $("title").innerHTML = "";
-    const s = document.createElement("span"); s.className = "dow"; s.textContent = dow;
+    const s = document.createElement("span"); s.className = "d"; s.textContent = DOW[dt.getUTCDay()];
     $("title").append(s, document.createTextNode(" · " + String(d).padStart(2, "0") + "/" + String(m).padStart(2, "0")));
   }
 
-  function estado(t) {
-    if (t.pulada) return "pulada";
-    const n = (t.etapas || []).length, f = (t.etapas || []).filter(e => e.feito).length;
-    return n > 0 && f === n ? "feita" : "pendente";
+  function el(tag, cls, txt) { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+
+  function renderPainel(ts) {
+    const r = resumo(ts);
+    const pct = r.total ? (r.feitas / r.total * 100) : 0;
+    setGauge(pct);
+    $("gsub").textContent = r.total && r.feitas === r.total ? "pauta fechada" : "da pauta";
+    document.querySelectorAll("#instr .ins").forEach((box, i) => {
+      const v = box.querySelector(".v"); v.innerHTML = "";
+      v.append(String(doc ? r.por[i] : 0)); const sm = el("small", null, "/" + r.vids); v.append(sm);
+      const leds = box.querySelector(".leds"); leds.innerHTML = "";
+      const n = Math.max(r.vids, 1);
+      for (let k = 0; k < n; k++) { const li = el("i", k < r.por[i] ? "on" : ""); leds.append(li); }
+    });
+    const f = $("faltam"); f.innerHTML = "";
+    if (doc === undefined) { f.textContent = "Carregando a pauta…"; return; }
+    if (!r.total) { f.textContent = "Nada na pauta deste dia ainda."; return; }
+    const faltam = r.total - r.feitas;
+    if (!faltam) { f.textContent = "Bandeirada! " + r.vFeitos + " de " + r.vids + " vídeos concluídos."; return; }
+    const b = el("b", null, "Faltam " + faltam + (faltam === 1 ? " etapa" : " etapas"));
+    f.append(b, document.createTextNode(" · " + r.vFeitos + " de " + r.vids + " vídeos concluídos"));
   }
 
   function render() {
     tituloData(atual);
-    const tarefas = (doc && Array.isArray(doc.tarefas)) ? doc.tarefas : [];
-    let total = 0, feitas = 0, tFeitas = 0, tConta = 0;
-    tarefas.forEach(t => {
-      if (t.pulada) return;
-      tConta++;
-      (t.etapas || []).forEach(e => { total++; if (e.feito) feitas++; });
-      if (estado(t) === "feita") tFeitas++;
-    });
-    if (doc) {
-      $("pbig").textContent = feitas + " de " + total + " etapas";
-      $("psmall").textContent = tFeitas + " de " + tConta + " vídeos concluídos";
-    }
-    $("pbar").style.width = total ? (feitas / total * 100) + "%" : "0%";
+    const ts = doc && Array.isArray(doc.tarefas) ? doc.tarefas : [];
+    renderPainel(ts);
+
+    const cont = { todas: ts.length, pendentes: ts.filter(t => estado(t) === "pendente").length };
+    cont.feitas = ts.length - cont.pendentes;
+    ["todas", "pendentes", "feitas"].forEach(k => { $("c-" + k).textContent = doc ? String(cont[k]) : ""; });
+    document.querySelectorAll(".filters button").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === filtro ? "true" : "false"));
 
     const ol = $("tasks"); ol.innerHTML = "";
-    $("empty").hidden = !(doc !== undefined && tarefas.length === 0 && dbPronto);
-    tarefas.forEach((t, ti) => {
+    $("empty").hidden = !(dbPronto && ts.length === 0);
+    ts.forEach((t, ti) => {
       const st = estado(t);
       if (filtro === "pendentes" && st !== "pendente") return;
       if (filtro === "feitas" && st === "pendente") return;
-      const li = document.createElement("li");
-      li.className = "task" + (st === "feita" ? " done" : "") + (st === "pulada" ? " skipped" : "");
-
-      const head = document.createElement("div"); head.className = "thead";
-      const num = document.createElement("span"); num.className = "num"; num.textContent = String(ti + 1).padStart(2, "0");
-      const main = document.createElement("div"); main.className = "tmain";
-      const title = document.createElement("div"); title.className = "title"; title.textContent = t.titulo || "Sem nome";
-      main.append(title);
-      const tags = document.createElement("div"); tags.className = "tags";
-      (t.tags || []).forEach(x => { const s = document.createElement("span"); s.className = "tag"; s.textContent = x; tags.append(s); });
-      if (t.condicao) { const s = document.createElement("span"); s.className = "tag cond"; s.textContent = t.condicao; tags.append(s); }
-      if (st === "feita") { const s = document.createElement("span"); s.className = "tag ok"; s.textContent = "Concluído"; tags.append(s); }
-      if (st === "pulada") { const s = document.createElement("span"); s.className = "tag cond"; s.textContent = "Não rolou hoje"; tags.append(s); }
-      if (tags.childElementCount) main.append(tags);
-      const more = document.createElement("button"); more.className = "more"; more.textContent = "⋯";
-      more.setAttribute("aria-label", "Opções de " + (t.titulo || "tarefa"));
-      more.addEventListener("click", () => { aberto = aberto === t.id ? null : t.id; render(); });
-      head.append(num, main);
-      if (podeEscrever) head.append(more);
-      li.append(head);
-
-      const steps = document.createElement("div"); steps.className = "steps";
-      (t.etapas || []).forEach((e, ei) => {
-        if (ei > 0) { const a = document.createElement("span"); a.className = "arrow"; a.textContent = "→"; a.setAttribute("aria-hidden", "true"); steps.append(a); }
-        const b = document.createElement("button"); b.className = "step";
-        b.setAttribute("aria-pressed", e.feito ? "true" : "false");
-        b.disabled = !podeEscrever || !!t.pulada;
-        const box = document.createElement("span"); box.className = "box";
-        b.append(box, document.createTextNode(e.nome));
-        b.addEventListener("click", () => mudar(tarefas2 => {
-          const tt = tarefas2.find(x => x.id === t.id); if (!tt) return;
-          tt.etapas[ei].feito = !tt.etapas[ei].feito;
-        }));
-        steps.append(b);
-      });
-      li.append(steps);
-
-      if (aberto === t.id && podeEscrever) {
-        const m = document.createElement("div"); m.className = "menu";
-        const pular = document.createElement("button");
-        pular.textContent = t.pulada ? "Voltar para a pauta" : "Não rolou hoje";
-        pular.addEventListener("click", () => { aberto = null; mudar(ts => { const tt = ts.find(x => x.id === t.id); if (tt) tt.pulada = !tt.pulada; }); });
-        const rem = document.createElement("button"); rem.className = "danger"; rem.textContent = "Remover";
-        rem.addEventListener("click", () => {
-          if (rem.dataset.confirm) { aberto = null; mudar(ts => { const i = ts.findIndex(x => x.id === t.id); if (i >= 0) ts.splice(i, 1); }); }
-          else { rem.dataset.confirm = "1"; rem.textContent = "Toque de novo para remover"; }
-        });
-        m.append(pular, rem);
-        li.append(m);
-      }
-      ol.append(li);
+      ol.append(cardTarefa(t, ti, st));
     });
 
     const i = dias.indexOf(atual);
-    $("prev").disabled = !(dias.length && (i > 0 || (i === -1 && dias[0] < atual)));
-    $("next").disabled = !(dias.length && ((i >= 0 && i < dias.length - 1) || (i === -1 && dias[dias.length - 1] > atual)));
-    document.querySelectorAll(".filters button").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === filtro ? "true" : "false"));
-    $("addbox").hidden = !podeEscrever || !db;
+    $("prev").disabled = !dias.some(d => d < atual);
+    $("next").disabled = !dias.some(d => d > atual);
+    $("fab").hidden = !podeEscrever || !db;
+    ultimoToque = null;
   }
-  let dbPronto = false;
 
-  function mudar(fn) {
+  function cardTarefa(t, ti, st) {
+    const li = el("li", "task" + (st === "feita" ? " done" : "") + (st === "pulada" ? " skipped" : ""));
+    const strip = el("div", "strip"); t.etapas.forEach(e => strip.append(el("i", e.feito && !t.pulada ? "on" : "")));
+    li.append(strip);
+
+    if (st === "feita" && !expandidos.has(t.id)) {
+      const c = el("button", "compact"); c.setAttribute("aria-expanded", "false");
+      const fin = t.etapas[2].escolha === "Programar" ? "Programado" : (praRafa(t) ? "Enviado pra Rafa" : "Enviado");
+      const txt = el("div", "tmain"); txt.append(el("span", "title", t.titulo || "Sem nome"), el("span", "meta", "Concluído · " + fin));
+      c.append(el("span", "flag"), txt, el("span", "chev", "▾"));
+      c.addEventListener("click", () => { expandidos.add(t.id); render(); });
+      li.append(c);
+      return li;
+    }
+
+    const body = el("div", "tbody");
+    const head = el("div", "thead");
+    const main = el("div", "tmain");
+    main.append(el("div", "title", t.titulo || "Sem nome"));
+    const tags = el("div", "tags");
+    (t.tags || []).forEach(x => tags.append(el("span", "tag", x)));
+    if (t.condicao) tags.append(el("span", "tag cond", t.condicao));
+    if (st === "pulada") tags.append(el("span", "tag cond", "Não rolou hoje"));
+    const nx = proxima(t);
+    if (st === "pendente" && nx >= 0) { const s = el("span", "tag next"); s.append("Próxima: "); s.append(el("b", null, nx === 2 ? (rotuloEnviar(t) + " ou programar") : t.etapas[nx].nome)); tags.append(s); }
+    if (tags.childElementCount) main.append(tags);
+    head.append(el("span", "num", String(ti + 1).padStart(2, "0")), main);
+    if (st === "feita") {
+      const fechar = el("button", "more", "▴"); fechar.setAttribute("aria-label", "Recolher " + (t.titulo || ""));
+      fechar.addEventListener("click", () => { expandidos.delete(t.id); render(); });
+      head.append(fechar);
+    }
+    if (podeEscrever) {
+      const more = el("button", "more", "⋯"); more.setAttribute("aria-label", "Opções de " + (t.titulo || "tarefa"));
+      more.setAttribute("aria-expanded", aberto === t.id ? "true" : "false");
+      more.addEventListener("click", () => { aberto = aberto === t.id ? null : t.id; render(); });
+      head.append(more);
+    }
+    body.append(head);
+
+    const steps = el("div", "steps");
+    const travado = !podeEscrever || !!t.pulada;
+    [0, 1].forEach(ei => {
+      const e = t.etapas[ei];
+      const b = el("button", "step" + (e.feito ? " done" : "") + (!e.feito && nx === ei && !t.pulada ? " next" : ""));
+      if (ultimoToque && ultimoToque.id === t.id && ultimoToque.i === ei) b.classList.add("just");
+      b.setAttribute("aria-pressed", e.feito ? "true" : "false");
+      b.disabled = travado;
+      const dot = el("span", "dot", String(ei + 1));
+      if (e.feito) { const ck = el("span", "check"); ck.innerHTML = CHECK; dot.append(ck); }
+      const lbl = el("span", "lbl");
+      if (!e.feito && nx === ei && !t.pulada) lbl.append(el("small", null, "Próxima"));
+      lbl.append(el("span", null, e.nome));
+      b.append(dot, lbl);
+      b.addEventListener("click", () => alternar(t.id, ei, null));
+      steps.append(b);
+    });
+
+    const ef = t.etapas[2];
+    const fin = el("div", "final" + (ef.feito ? " done" : "") + (!ef.feito && nx === 2 && !t.pulada ? " next" : ""));
+    if (ultimoToque && ultimoToque.id === t.id && ultimoToque.i === 2) fin.classList.add("just");
+    const fh = el("div", "fh");
+    const dot = el("span", "dot", "3"); fh.append(dot, el("span", null, "Enviar ou programar"));
+    if (!ef.feito && nx === 2 && !t.pulada) fh.append(el("small", null, "Próxima"));
+    fin.append(fh);
+    const seg = el("div", "seg"); seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Enviar ou programar");
+    [["Enviar", rotuloEnviar(t)], ["Programar", "Programar"]].forEach(([val, rot]) => {
+      const on = ef.escolha === val;
+      const b = el("button", on ? "on" : (ef.escolha ? "off" : ""));
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      b.disabled = travado;
+      if (on) b.insertAdjacentHTML("beforeend", '<svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg>');
+      b.append(rot);
+      b.addEventListener("click", () => alternar(t.id, 2, val));
+      seg.append(b);
+    });
+    fin.append(seg);
+    steps.append(fin);
+    body.append(steps);
+
+    if (aberto === t.id && podeEscrever) {
+      const m = el("div", "menu");
+      const pular = el("button", null, t.pulada ? "Voltar para a pauta" : "Não rolou hoje");
+      pular.addEventListener("click", () => {
+        aberto = null;
+        mudar(ts => { const x = ts.find(y => y.id === t.id); if (x) x.pulada = !x.pulada; }, t.pulada ? "“" + t.titulo + "” voltou para a pauta" : "“" + t.titulo + "” marcado como não rolou");
+      });
+      const rem = el("button", "danger", "Remover");
+      rem.addEventListener("click", () => {
+        if (rem.dataset.confirm) { aberto = null; mudar(ts => { const i = ts.findIndex(y => y.id === t.id); if (i >= 0) ts.splice(i, 1); }, "“" + t.titulo + "” removido"); }
+        else { rem.dataset.confirm = "1"; rem.textContent = "Toque de novo para remover"; }
+      });
+      m.append(pular, rem);
+      body.append(m);
+    }
+    li.append(body);
+    return li;
+  }
+
+  /* ---------- ações ---------- */
+  function alternar(id, i, escolha) {
+    const t0 = (doc.tarefas || []).find(x => x.id === id); if (!t0) return;
+    const antes = estado(t0);
+    let msg = "";
+    mudar(ts => {
+      const t = ts.find(x => x.id === id); if (!t) return;
+      const e = t.etapas[i];
+      if (i === 2) {
+        if (e.escolha === escolha) { e.escolha = null; e.feito = false; msg = "Desmarcado: " + t.titulo; }
+        else { e.escolha = escolha; e.feito = true; msg = (escolha === "Programar" ? "Programado" : (praRafa(t) ? "Enviado pra Rafa" : "Enviado")) + " · " + t.titulo; }
+      } else {
+        e.feito = !e.feito;
+        msg = (e.feito ? (i === 0 ? "Gravado" : "Editado") : "Desmarcado " + e.nome.toLowerCase()) + " · " + t.titulo;
+      }
+    }, () => msg, { id, i });
+    try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) {}
+    const t1 = doc.tarefas.find(x => x.id === id);
+    const depois = t1 ? estado(t1) : antes;
+    if (antes !== "feita" && depois === "feita") {
+      const r = resumo(doc.tarefas);
+      const card = document.querySelectorAll("#tasks > li");
+      if (r.total && r.feitas === r.total) setTimeout(() => fimDoDia(r), reduz ? 0 : 350);
+      else { const alvo = [...card].find(li => li.textContent.indexOf(t1.titulo) >= 0); confete(alvo, 60); }
+    }
+  }
+
+  let ultimoBackup = null;
+  function mudar(fn, msg, toque) {
     if (!db || !podeEscrever) return;
     const base = doc && Array.isArray(doc.tarefas) ? doc : { data: atual, tarefas: [] };
+    ultimoBackup = JSON.parse(JSON.stringify(base));
     const novo = JSON.parse(JSON.stringify(base));
     novo.data = atual;
     fn(novo.tarefas);
     novo.atualizado = new Date().toISOString();
-    doc = novo; render();
+    doc = novo; ultimoToque = toque || null; render();
+    gravar(novo);
+    const m = typeof msg === "function" ? msg() : msg;
+    if (m) toast(m, ultimoBackup);
+  }
+  function gravar(novo) {
     const ref = db.doc("dias/" + atual);
     fila = fila.then(() => ref.set(novo)).then(() => setStatus("")).catch(err => {
       if (err && err.code === "invalid_argument") { podeEscrever = false; setStatus("Você pode ver a pauta, mas não marcar.", true); render(); }
@@ -307,50 +623,108 @@ button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px 
     });
   }
 
+  let toastTimer = null, toastBackup = null;
+  function toast(msg, backup) {
+    toastBackup = backup;
+    $("toast-t").textContent = msg; $("toast").hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { $("toast").hidden = true; }, 4200);
+  }
+  $("toast-undo").addEventListener("click", () => {
+    if (!toastBackup || !podeEscrever) return;
+    const b = toastBackup; toastBackup = null;
+    b.atualizado = new Date().toISOString();
+    doc = b; render(); gravar(b);
+    $("toast").hidden = true;
+  });
+
+  /* ---------- confete quadriculado ---------- */
+  const fx = $("fx"); let parts = [], fxRaf = null;
+  function cor(nome) { try { return getComputedStyle(document.documentElement).getPropertyValue(nome).trim() || "#d0142c"; } catch (e) { return "#d0142c"; } }
+  function confete(alvo, n, grande) {
+    if (reduz) return;
+    const W = innerWidth, H = innerHeight, dpr = Math.min(devicePixelRatio || 1, 2);
+    fx.hidden = false; fx.width = W * dpr; fx.height = H * dpr;
+    const ctx = fx.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const cores = [cor("--red"), cor("--ink"), cor("--card"), cor("--panel-hot")];
+    let ox = W / 2, oy = H * 0.35;
+    if (alvo && alvo.getBoundingClientRect) { const r = alvo.getBoundingClientRect(); ox = r.left + r.width / 2; oy = Math.max(40, Math.min(H - 40, r.top + 30)); }
+    for (let k = 0; k < n; k++) {
+      const a = grande ? Math.random() * Math.PI * 2 : (-Math.PI / 2 + (Math.random() - .5) * 2.2);
+      const v = (grande ? 6 : 4) + Math.random() * (grande ? 9 : 6);
+      parts.push({ x: grande ? Math.random() * W : ox, y: grande ? -20 - Math.random() * H * .3 : oy, vx: Math.cos(a) * v * (grande ? .4 : 1), vy: grande ? Math.random() * 3 : Math.sin(a) * v, s: 5 + Math.random() * 6, r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: cores[k % cores.length], life: 0 });
+    }
+    if (!fxRaf) fxRaf = requestAnimationFrame(passoFx);
+  }
+  function passoFx() {
+    const ctx = fx.getContext("2d"); ctx.clearRect(0, 0, innerWidth, innerHeight);
+    parts = parts.filter(p => p.y < innerHeight + 30 && p.life < 260);
+    parts.forEach(p => {
+      p.vy += .22; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life++;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c;
+      ctx.strokeStyle = cor("--line"); ctx.lineWidth = .5;
+      ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s); ctx.strokeRect(-p.s / 2, -p.s / 2, p.s, p.s); ctx.restore();
+    });
+    if (parts.length) fxRaf = requestAnimationFrame(passoFx); else { fxRaf = null; fx.hidden = true; }
+  }
+  function fimDoDia(r) {
+    $("fin-p").textContent = r.vFeitos + (r.vFeitos === 1 ? " vídeo concluído" : " vídeos concluídos") + " hoje. Bandeirada!";
+    $("finish").hidden = false;
+    confete(null, 160, true);
+    $("fin-ok").focus();
+  }
+  $("fin-ok").addEventListener("click", () => { $("finish").hidden = true; });
+  $("finish").addEventListener("click", (e) => { if (e.target === $("finish")) $("finish").hidden = true; });
+
+  /* ---------- folha de adicionar ---------- */
+  function abrirFolha(v) {
+    $("sheet").hidden = !v; $("scrim").hidden = !v;
+    if (v) setTimeout(() => $("add-title").focus(), 50); else $("fab").focus();
+  }
+  $("fab").addEventListener("click", () => abrirFolha(true));
+  $("scrim").addEventListener("click", () => abrirFolha(false));
+  $("add-cancel").addEventListener("click", () => abrirFolha(false));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") { if (!$("sheet").hidden) abrirFolha(false); if (!$("finish").hidden) $("finish").hidden = true; } });
+  $("add-cond").addEventListener("change", () => { $("add-cond-wrap").hidden = !$("add-cond").checked; });
+  $("addform").addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    const titulo = $("add-title").value.trim(); if (!titulo) return;
+    const tag = $("add-tag").value.trim();
+    const nova = { id: "t" + Date.now().toString(36), titulo, tags: tag ? tag.split(/\s*,\s*/).filter(Boolean) : [],
+      etapas: [{ nome: "Gravar", feito: false }, { nome: "Editar", feito: false }, etapaFinal(null)] };
+    if ($("add-cond").checked) nova.condicao = $("add-cond-txt").value.trim() || "Depende de alguém aparecer";
+    mudar(ts => ts.push(nova), "Adicionado: " + titulo);
+    $("add-title").value = ""; $("add-tag").value = ""; $("add-cond").checked = false; $("add-cond-txt").value = ""; $("add-cond-wrap").hidden = true;
+    abrirFolha(false);
+  });
+
+  /* ---------- dias ---------- */
   function abrirDia(iso) {
-    atual = iso; aberto = null; doc = undefined; dbPronto = false;
+    atual = iso; aberto = null; doc = undefined; dbPronto = false; expandidos.clear();
     if (unsubDoc) unsubDoc();
     render();
     if (!db) return;
     const timer = setTimeout(() => setStatus("Ainda não consegui carregar a pauta. Pode estar desatualizada.", true), 10000);
     unsubDoc = db.doc("dias/" + iso).onSnapshot(snap => {
       if (!snap.metadata.fromCache) { clearTimeout(timer); setStatus(""); }
-      doc = snap.exists ? snap.data() : null; dbPronto = true; render();
+      doc = snap.exists ? normDoc(snap.data()) : null; dbPronto = true; render();
     }, () => { clearTimeout(timer); dbPronto = true; setStatus("A pauta não está disponível agora.", true); render(); });
   }
-
-  $("prev").addEventListener("click", () => {
-    const ant = dias.filter(d => d < atual); if (ant.length) abrirDia(ant[ant.length - 1]);
-  });
-  $("next").addEventListener("click", () => {
-    const prox = dias.filter(d => d > atual); if (prox.length) abrirDia(prox[0]);
-  });
+  $("prev").addEventListener("click", () => { const a = dias.filter(d => d < atual); if (a.length) abrirDia(a[a.length - 1]); });
+  $("next").addEventListener("click", () => { const p = dias.filter(d => d > atual); if (p.length) abrirDia(p[0]); });
   document.querySelectorAll(".filters button").forEach(b => b.addEventListener("click", () => {
     filtro = b.dataset.f; try { localStorage.setItem("pauta-filtro", filtro); } catch (e) {} render();
   }));
-  $("addform").addEventListener("submit", (ev) => {
-    ev.preventDefault();
-    const titulo = $("add-title").value.trim(); if (!titulo) return;
-    const tag = $("add-tag").value.trim();
-    const etapas = [...document.querySelectorAll("#add-steps input:checked")].map(c => ({ nome: c.value, feito: false }));
-    if (!etapas.length) etapas.push({ nome: "Fazer", feito: false });
-    mudar(ts => ts.push({ id: "t" + Date.now().toString(36), titulo, tags: tag ? [tag] : [], etapas }));
-    $("add-title").value = ""; $("add-tag").value = "";
-  });
 
   render();
   (async () => {
     db = window.claude && window.claude.use ? await window.claude.use("db") : null;
-    if (!db) { $("pbig").textContent = "–"; $("psmall").textContent = "Abra no claude.ai, com sua conta, para ver e marcar a pauta."; return; }
+    if (!db) { $("faltam").textContent = "Abra no claude.ai, com sua conta, para ver e marcar a pauta."; return; }
     try {
       const user = await window.claude.use("user");
       const pode = user && user.can ? await user.can("data.write") : null;
       if (pode === false) podeEscrever = false;
     } catch (e) {}
-    db.collection("dias").onSnapshot(snap => {
-      dias = snap.docs.map(d => d.id).sort();
-      render();
-    }, () => {});
+    db.collection("dias").onSnapshot(snap => { dias = snap.docs.map(d => d.id).sort(); render(); }, () => {});
     abrirDia(HOJE);
   })();
 })();
