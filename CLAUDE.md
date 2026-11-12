@@ -37,20 +37,21 @@ Jornada: seg–sex 8h–17h (8h trabalhadas), sábado 8h–16h (7h), 1h de almo�
 
 ## Pauta do dia (checklist de vídeos)
 
-Ela manda pelo chat o que vai fazer no dia (gravar, editar, enviar pra Rafa, programar, postar,
+Ela manda pelo chat o que vai fazer no dia (gravar, editar, enviar pro grupo do marketing, programar, postar,
 jogar no Garagem…). Cada dia vira um checklist na página **Pauta do Dia**:
 https://claude.ai/artifact/JjaVpTX7ePsXvYbzN4TtaX (código: `pauta/pauta-do-dia.html`).
 
 - Os dados ficam no banco da página (ferramenta `ArtifactData`, `url` acima), coleção `dias`,
   um documento por dia com id `AAAA-MM-DD` (fuso de São Paulo).
-- Formato: `{"data": "AAAA-MM-DD", "tarefas": [{"id", "titulo", "tags": ["com o Otávio", "pra Rafa"],
+- Formato: `{"data": "AAAA-MM-DD", "tarefas": [{"id", "titulo", "tags": ["com o Otávio"],
   "condicao": "Se o Mário aparecer" (opcional), "pulada": false (opcional), "etapas": [...]}], "atualizado": "<ISO>"}`.
 - Regra dela: **toda tarefa tem sempre 3 etapas**, nesta ordem:
   `{"nome": "Gravar", "feito": false}`, `{"nome": "Editar", "feito": false}`,
-  `{"nome": "Enviar, programar ou postar", "opcoes": ["Enviar", "Programar", "Postar"], "escolha": null, "feito": false}`.
-  Na última, ao concluir: `"escolha": "Enviar"`, `"Programar"` ou `"Postar"` e `"feito": true`.
+  `{"nome": "Programar ou postar", "opcoes": ["Programar", "Postar"], "escolha": null, "feito": false, "enviado": false}`.
+  Na última, ao concluir: `"escolha": "Programar"` ou `"Postar"` e `"feito": true`.
+  `"enviado": true` = enviado pro grupo do marketing. Isso NÃO conclui o vídeo: ela ainda programa ou posta depois.
+  (Não usar "Enviar pra Rafa": o envio é sempre pro grupo do marketing.)
   Se a tarefa já chegou gravada (ex.: "editar o vídeo X"), criar com Gravar já `feito: true`.
-  Tag "pra Rafa" faz a página mostrar "Enviar pra Rafa".
 - Ela marca as etapas tocando na página. Quando ela disser no chat que fez algo, ler o documento
   (`get`) e atualizar com `if_version`. Para totalizar o dia, ler o documento e resumir o que foi feito,
   o que ficou pendente e o que "não rolou" (tarefas com `pulada: true`).
