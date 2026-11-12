@@ -34,3 +34,20 @@ Datas: `hoje`, `ontem`, `DD/MM`, `DD/MM/AAAA` (fuso de São Paulo).
 
 Jornada: seg–sex 8h–17h (8h trabalhadas), sábado 8h–16h (7h), 1h de almoço, domingo folga,
 1 folga extra por mês. Limite CLT: 44h/semana.
+
+## Pauta do dia (checklist de vídeos)
+
+Ela manda pelo chat o que vai fazer no dia (gravar, editar, fotografar, mandar pra Rafa, postar,
+jogar no Garagem…). Cada dia vira um checklist na página **Pauta do Dia**:
+https://claude.ai/artifact/JjaVpTX7ePsXvYbzN4TtaX (código: `pauta/pauta-do-dia.html`).
+
+- Os dados ficam no banco da página (ferramenta `ArtifactData`, `url` acima), coleção `dias`,
+  um documento por dia com id `AAAA-MM-DD` (fuso de São Paulo).
+- Formato: `{"data": "AAAA-MM-DD", "tarefas": [{"id", "titulo", "tags": ["com o Otávio", "pra Rafa"],
+  "condicao": "Se o Mário aparecer" (opcional), "pulada": false (opcional),
+  "etapas": [{"nome": "Gravar", "feito": false}, ...]}], "atualizado": "<ISO>"}`.
+- Etapas usuais, nessa ordem: Gravar, Fotografar, Editar, Mandar pra Rafa, Postar, Jogar no Garagem.
+- Ela marca as etapas tocando na página. Quando ela disser no chat que fez algo, ler o documento
+  (`get`) e atualizar com `if_version`. Para totalizar o dia, ler o documento e resumir o que foi feito,
+  o que ficou pendente e o que "não rolou" (tarefas com `pulada: true`).
+- Pendências que ela quiser levar para o dia seguinte: copiar só as etapas não feitas para o novo dia.
