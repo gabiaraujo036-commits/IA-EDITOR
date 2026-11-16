@@ -56,7 +56,15 @@
     "volta_almoco": "15:58"
   },
   "2026-11-13": {
-    "chegada": "09:00"
+    "chegada": "09:00",
+    "saida": "14:00",
+    "anotacoes": [
+      {
+        "tipo": "Saída antecipada",
+        "texto": "Saiu às 14h para ir a uma palestra no Hack and Play",
+        "registrado_em": "2026-11-16 08:53"
+      }
+    ]
   },
   "2026-11-16": {
     "chegada": "08:36"
