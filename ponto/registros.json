@@ -51,6 +51,11 @@
         "tipo": "Almoço interrompido",
         "texto": "Voltou do almoço às 15:58. Dentro do intervalo (15:10–15:58) houve ~20 min de gravação (aproximado), então o almoço real foi de ~28 min",
         "registrado_em": "2026-11-12 15:58"
+      },
+      {
+        "tipo": "Outro",
+        "texto": "Não lembra o horário de saída",
+        "registrado_em": "2026-11-19 10:04"
       }
     ],
     "volta_almoco": "15:58"
