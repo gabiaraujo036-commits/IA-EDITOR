@@ -25,7 +25,17 @@ import gerar_planilha as gp  # noqa: E402
 FUSO = ZoneInfo("America/Sao_Paulo")
 CAMPOS = {"chegada": "chegada", "saida_almoco": "saída p/ almoço",
           "volta_almoco": "volta do almoço", "saida": "saída"}
-PREVISTO = {0: 8, 1: 8, 2: 8, 3: 8, 4: 8, 5: 7, 6: 0}
+
+
+def jornada(d):
+    """Jornada vigente na data d (ponto/config.json): (entrada em min ou None, horas previstas em min)."""
+    js = sorted(gp.carregar_config()["jornadas"], key=lambda j: j["desde"])
+    j = [x for x in js if x["desde"] <= d.isoformat()][-1]
+    if d.weekday() == 6:
+        return None, 0
+    if d.weekday() == 5:
+        return minutos(j["entrada_sabado"]), minutos(j["horas_sabado"])
+    return minutos(j["entrada_semana"]), minutos(j["horas_semana"])
 
 
 def parse_data(txt):
@@ -79,7 +89,7 @@ def fmt(mins, sinal=False):
 def calc_dia(d, reg):
     """Retorna (trabalhado, previsto, diferença) em minutos; trabalhado None se incompleto."""
     obs = reg.get("observacao")
-    prev = 0 if obs in ("Folga", "Feriado", "Atestado") else PREVISTO[d.weekday()] * 60
+    prev = 0 if obs in ("Folga", "Feriado", "Atestado") else jornada(d)[1]
     if reg.get("chegada") and reg.get("saida"):
         t = (minutos(reg["saida"]) - minutos(reg["chegada"])) % 1440
         if reg.get("saida_almoco") and reg.get("volta_almoco"):
@@ -100,10 +110,11 @@ def mostrar(d, regs):
     for n in reg.get("anotacoes") or []:
         print(f"  anotação         {(n.get('tipo') + ': ') if n.get('tipo') else ''}{n['texto']}")
     t, p, dif = calc_dia(d, reg)
-    if reg.get("chegada") and d.weekday() != 6:
-        atraso = minutos(reg["chegada"]) - 8 * 60
+    entrada = jornada(d)[0]
+    if reg.get("chegada") and entrada is not None:
+        atraso = minutos(reg["chegada"]) - entrada
         if atraso > 0:
-            print(f"  ⚠ chegada {fmt(atraso)} depois das 08:00")
+            print(f"  ⚠ chegada {fmt(atraso)} depois das {fmt(entrada).replace('h', ':').zfill(5)}")
     if t is not None:
         print(f"  trabalhado {fmt(t)} | previsto {fmt(p)} | diferença {fmt(dif, True)}")
     elif reg.get("chegada") and not reg.get("saida") and p:

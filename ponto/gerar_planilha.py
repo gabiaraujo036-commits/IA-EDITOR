@@ -16,6 +16,7 @@ from openpyxl.worksheet.datavalidation import DataValidation
 
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
 REGISTROS = RAIZ / "ponto" / "registros.json"
+CONFIG = RAIZ / "ponto" / "config.json"
 SAIDA = RAIZ / "planilhas" / "ponto-mario-car.xlsx"
 
 INICIO = (2026, 11)
@@ -57,17 +58,27 @@ TF = "[h]:mm"
 HEAD = ["Data", "Dia da semana", "Chegada", "Saída para almoço", "Volta do almoço",
         "Saída", "Horas trabalhadas", "Tempo de almoço", "Horas previstas",
         "Diferença do dia", "Observação", "Anotação (motivo)", "Acima de 44h (semana)",
-        "Dif. (cálculo)"]
-WIDTH = [11, 14, 10, 11, 11, 10, 12, 11, 11, 11, 13, 34, 13, 10]
-# A..N
-cA, cB, cC, cD, cE, cF, cG, cH, cI, cJ, cK, cL, cM, cN = range(1, 15)
-HIDDEN = "N"
+        "Dif. (cálculo)", "Entrada prevista"]
+WIDTH = [11, 14, 10, 11, 11, 10, 12, 11, 11, 11, 13, 34, 13, 10, 10]
+# A..O
+cA, cB, cC, cD, cE, cF, cG, cH, cI, cJ, cK, cL, cM, cN, cO = range(1, 16)
+HIDDEN = ("N", "O")
 
 # ---- configuração (aba Resumo) ----
-CFG_SEMANA = "Resumo!$C$5"
-CFG_SAB = "Resumo!$C$6"
-CFG_LIMITE = "Resumo!$C$7"
-CFG_ENTRADA = "Resumo!$C$8"
+CFG_LIMITE = "Resumo!$C$5"
+JR0 = 8  # primeira linha da tabela de jornadas na aba Resumo
+
+
+def carregar_config():
+    return json.loads(CONFIG.read_text(encoding="utf-8"))
+
+
+def jornada_refs(n):
+    """Fórmulas que buscam, na tabela de jornadas do Resumo, a jornada vigente na data da célula A{r}."""
+    a, b = JR0, JR0 + n - 1
+    def col(c):
+        return lambda r: f"INDEX(Resumo!${c}${a}:${c}${b},MATCH(A{r},Resumo!$B${a}:$B${b},1))"
+    return col("C"), col("D"), col("E"), col("F")  # entrada sem., horas sem., entrada sáb., horas sáb.
 
 
 def saldo_txt(ref):
@@ -106,7 +117,10 @@ def texto_anotacoes(dia):
     return "; ".join(f"{n['tipo']}: {n['texto']}" if n.get("tipo") else n["texto"] for n in notas)
 
 
-def gerar(registros, saida=SAIDA):
+def gerar(registros, saida=SAIDA, config=None):
+    config = config or carregar_config()
+    jornadas = sorted(config["jornadas"], key=lambda j: j["desde"])
+    ent_sem, hrs_sem, ent_sab, hrs_sab = jornada_refs(len(jornadas))
     wb = Workbook()
     res = wb.active
     res.title = "Resumo"
@@ -120,7 +134,8 @@ def gerar(registros, saida=SAIDA):
         ultimo_mes = idx == len(meses) - 1
         for i, w in enumerate(WIDTH):
             ws.column_dimensions[get_column_letter(i + 1)].width = w
-        ws.column_dimensions[HIDDEN].hidden = True
+        for hcol in HIDDEN:
+            ws.column_dimensions[hcol].hidden = True
 
         ws["A1"] = f"Controle de Ponto – Mario Car – {MESES[m-1]} de {y}"
         ws["A1"].font = f_title
@@ -130,11 +145,9 @@ def gerar(registros, saida=SAIDA):
         ws["A2"] = ("Células amarelas = entrada de dados. Horários em hh:mm (ex.: 08:00). Observação: Folga, Falta, "
                     "Atestado ou Feriado. Anotação: o motivo (atraso, falta, saída antecipada…).")
         ws["A2"].font = f_note
-        ws["A3"] = ("Chegada em laranja = depois do horário de entrada. Folga, Feriado e Atestado zeram as horas previstas; "
+        ws["A3"] = ("Chegada em laranja = depois do horário de entrada (ver jornadas na aba Resumo). Folga, Feriado e Atestado zeram as horas previstas; "
                     "Falta sem horários conta o dia todo como negativo. Semanas que cruzam o mês são totalizadas no mês em que terminam.")
         ws["A3"].font = f_note
-        ws["N2"] = f"={CFG_ENTRADA}"  # cópia local da hora de entrada (usada na formatação condicional)
-        ws["N2"].number_format = "hh:mm"
 
         HR = 4
         for c, h in enumerate(HEAD, 1):
@@ -211,11 +224,12 @@ def gerar(registros, saida=SAIDA):
                 ws.cell(r, cL, notas)
             ws.cell(r, cG, f'=IF(OR(C{r}="",F{r}=""),"",MOD(F{r}-C{r},1)-IF(OR(D{r}="",E{r}=""),0,MOD(E{r}-D{r},1)))')
             ws.cell(r, cH, f'=IF(OR(D{r}="",E{r}=""),"",MOD(E{r}-D{r},1))')
-            ws.cell(r, cI, f'=IF(OR(K{r}="Folga",K{r}="Feriado",K{r}="Atestado"),0,'
-                           f'CHOOSE(WEEKDAY(A{r},2),{CFG_SEMANA},{CFG_SEMANA},{CFG_SEMANA},{CFG_SEMANA},{CFG_SEMANA},{CFG_SAB},0))')
+            ws.cell(r, cI, f'=IF(OR(K{r}="Folga",K{r}="Feriado",K{r}="Atestado",WEEKDAY(A{r},2)=7),0,'
+                           f'IF(WEEKDAY(A{r},2)=6,{hrs_sab(r)},{hrs_sem(r)}))')
+            ws.cell(r, cO, f'=IF(WEEKDAY(A{r},2)=7,"",IF(WEEKDAY(A{r},2)=6,{ent_sab(r)},{ent_sem(r)}))')
             ws.cell(r, cN, f'=IF(G{r}="",IF(K{r}="Falta",-I{r},""),ROUND((G{r}-I{r})*1440,0)/1440)')
             ws.cell(r, cJ, saldo_txt(f"N{r}"))
-            for c in range(1, cN + 1):
+            for c in range(1, cO + 1):
                 cell = ws.cell(r, c)
                 cell.border = border
                 cell.font = f_base
@@ -229,6 +243,8 @@ def gerar(registros, saida=SAIDA):
                     cell.fill = fill_sun
                 if c in (cG, cH, cI, cN):
                     cell.number_format = TF
+                if c == cO:
+                    cell.number_format = "hh:mm"
             dv_time.add(f"C{r}:F{r}")
             dv_obs.add(f"K{r}")
             data_rows.append(r)
@@ -256,7 +272,7 @@ def gerar(registros, saida=SAIDA):
             ("Total previsto", f"=SUM({rng('I', data_rows)})", TF),
             ("Saldo do mês", None, None),
             ("Horas acima de 44h (soma das semanas)", f"=SUM({rng('M', week_rows)})", TF),
-            ("Chegadas após o horário", f'=COUNTIF(C{d0}:C{d1},">"&$N$2)', "0"),
+            ("Chegadas após o horário", f'=SUMPRODUCT(ISNUMBER(C{d0}:C{d1})*ISNUMBER(O{d0}:O{d1})*(C{d0}:C{d1}>O{d0}:O{d1}))', "0"),
             ("Dias de folga", f'=COUNTIF(K{d0}:K{d1},"Folga")', "0"),
             ("Faltas", f'=COUNTIF(K{d0}:K{d1},"Falta")', "0"),
             ("Atestados", f'=COUNTIF(K{d0}:K{d1},"Atestado")', "0"),
@@ -281,7 +297,7 @@ def gerar(registros, saida=SAIDA):
         # ---- formatação condicional ----
         first, lastr = HR + 1, r
         ws.conditional_formatting.add(f"C{d0}:C{d1}", FormulaRule(
-            formula=[f'AND(ISNUMBER(C{d0}),C{d0}>$N$2)'], fill=fill_late, font=Font(name=F, bold=True, color="833C0B")))
+            formula=[f'AND(ISNUMBER(C{d0}),ISNUMBER(O{d0}),C{d0}>O{d0})'], fill=fill_late, font=Font(name=F, bold=True, color="833C0B")))
         ws.conditional_formatting.add(f"M{first}:M{lastr}", FormulaRule(
             formula=[f'AND(ISNUMBER(M{first}),M{first}>0)'], fill=fill_alert,
             font=Font(name=F, bold=True, color="C00000")))
@@ -305,14 +321,14 @@ def gerar(registros, saida=SAIDA):
         resumo_links.append((name, MESES[m - 1], y, sumrows))
         prev = trailing
 
-    _aba_resumo(res, resumo_links)
+    _aba_resumo(res, resumo_links, config, jornadas)
     _aba_agenda(wb.create_sheet("Agenda", 1), registros)
     saida.parent.mkdir(parents=True, exist_ok=True)
     wb.save(saida)
     return saida
 
 
-def _aba_resumo(res, resumo_links):
+def _aba_resumo(res, resumo_links, config, jornadas):
     for i, w in enumerate([4, 30, 14, 14, 14, 14, 11, 10, 10, 10, 10, 10]):
         res.column_dimensions[get_column_letter(i + 1)].width = w
     res.column_dimensions["M"].hidden = True
@@ -327,23 +343,43 @@ def _aba_resumo(res, resumo_links):
 
     res["B4"] = "Configuração da jornada"
     res["B4"].font = Font(name=F, size=11, bold=True)
-    cfg = [("Horas previstas seg. a sex.", dt.time(8, 0), "Jornada 8h–17h com 1h de almoço (informado pela usuária)"),
-           ("Horas previstas sábado", dt.time(7, 0), "Jornada 8h–16h com 1h de almoço (informado pela usuária)"),
-           ("Limite semanal (CLT)", 44 / 24, "44h por semana – CLT art. 58 / CF art. 7º, XIII"),
-           ("Horário de entrada", dt.time(8, 0), "Chegada depois deste horário fica em laranja (informado pela usuária)")]
-    for i, (lab, val, note) in enumerate(cfg):
-        rr = 5 + i
-        res.cell(rr, 2, lab).font = f_base
-        res.cell(rr, 2).border = border
-        c = res.cell(rr, 3, val)
-        c.number_format = "hh:mm" if "entrada" in lab else TF
-        c.font = f_input
-        c.fill = fill_input
-        c.alignment = center
-        c.border = border
-        res.cell(rr, 4, note).font = f_note
+    h, m = map(int, config.get("limite_semanal", "44:00").split(":"))
+    res.cell(5, 2, "Limite semanal (CLT)").font = f_base
+    res.cell(5, 2).border = border
+    c = res.cell(5, 3, (h * 60 + m) / 1440)
+    c.number_format = TF
+    c.font = f_input
+    c.fill = fill_input
+    c.alignment = center
+    c.border = border
+    res.cell(5, 4, "44h por semana – CLT art. 58 / CF art. 7º, XIII").font = f_note
 
-    TR = 11
+    hj = ["Jornada desde", "Entrada seg–sex", "Horas seg–sex", "Entrada sábado", "Horas sábado", "Descrição"]
+    for ci, txt in enumerate(hj, 2):
+        cell = res.cell(JR0 - 1, ci, txt)
+        cell.font = f_head
+        cell.fill = fill_head
+        cell.alignment = wrapc
+        cell.border = border
+    res.row_dimensions[JR0 - 1].height = 30
+    for i, j in enumerate(jornadas):
+        rr = JR0 + i
+        vals = [dt.date.fromisoformat(j["desde"]), hora(j["entrada_semana"]), hora(j["horas_semana"]),
+                hora(j["entrada_sabado"]), hora(j["horas_sabado"]), j.get("descricao", "")]
+        for ci, v in enumerate(vals, 2):
+            cell = res.cell(rr, ci, v)
+            cell.font = f_base if ci == 7 else f_input
+            cell.border = border
+            cell.alignment = Alignment(horizontal="left", vertical="center") if ci == 7 else center
+            if ci == 2:
+                cell.number_format = "dd/mm/yyyy"
+            elif ci < 7:
+                cell.number_format = "hh:mm"
+                cell.fill = fill_input
+    res.cell(JR0 + len(jornadas), 2, "Cada linha vale a partir da data indicada (informado pela usuária). "
+                                     "Os dias anteriores continuam com a jornada antiga.").font = f_note
+
+    TR = JR0 + len(jornadas) + 3
     heads = ["Mês", "Total trabalhado", "Total previsto", "Saldo", "Acima de 44h",
              "Chegadas após horário", "Folgas", "Faltas", "Atestados", "Feriados"]
     for c, h in enumerate(heads, 2):
@@ -442,7 +478,7 @@ def _aba_agenda(ws, registros):
         ws.cell(5, 1, "Nenhuma anotação ainda.").font = f_note
 
 
-def carregar():
+def carregar():  # registros
     if REGISTROS.exists():
         return json.loads(REGISTROS.read_text(encoding="utf-8"))
     return {}

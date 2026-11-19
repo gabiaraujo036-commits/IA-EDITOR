@@ -1,0 +1,21 @@
+{
+  "limite_semanal": "44:00",
+  "jornadas": [
+    {
+      "desde": "2026-11-01",
+      "descricao": "Seg–sex 8h–17h, sábado 8h–16h, 1h de almoço",
+      "entrada_semana": "08:00",
+      "horas_semana": "08:00",
+      "entrada_sabado": "08:00",
+      "horas_sabado": "07:00"
+    },
+    {
+      "desde": "2026-11-19",
+      "descricao": "Seg–sex 9h–18h, 1h de almoço (sábado mantido 8h–16h até confirmar)",
+      "entrada_semana": "09:00",
+      "horas_semana": "08:00",
+      "entrada_sabado": "08:00",
+      "horas_sabado": "07:00"
+    }
+  ]
+}
