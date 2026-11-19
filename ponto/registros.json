@@ -68,7 +68,16 @@
   },
   "2026-11-14": {
     "chegada": "08:30",
-    "saida": "16:00"
+    "saida": "16:00",
+    "saida_almoco": "12:00",
+    "volta_almoco": "12:20",
+    "anotacoes": [
+      {
+        "tipo": "Outro",
+        "texto": "Almoço de 20 min; horários 12:00–12:20 são aproximados (não informou os exatos)",
+        "registrado_em": "2026-11-19 10:02"
+      }
+    ]
   },
   "2026-11-16": {
     "chegada": "08:36"
