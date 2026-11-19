@@ -34,7 +34,7 @@ Datas: `hoje`, `ontem`, `DD/MM`, `DD/MM/AAAA` (fuso de São Paulo).
 
 Jornada: definida em `ponto/config.json` (lista `jornadas`, cada uma vale a partir de `desde`).
 - Até 18/11/2026: seg–sex 8h–17h (8h), sábado 8h–16h (7h), 1h de almoço.
-- Desde 19/11/2026: seg–sex 9h–18h (8h), 1h de almoço; sábado mantido 8h–16h (7h) até ela confirmar.
+- Desde 19/11/2026: seg–sex 9h–18h (8h), 1h de almoço; sábado continua 8h–16h (7h) (confirmado por ela).
 Domingo folga, 1 folga extra por mês. Limite CLT: 44h/semana.
 Mudou o horário? Acrescentar uma nova jornada em `ponto/config.json` com a data de início
 (nunca alterar as antigas) e rodar `python3 ponto/gerar_planilha.py` + recálculo (ou qualquer registro).
