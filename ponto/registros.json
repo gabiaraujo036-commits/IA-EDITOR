@@ -57,12 +57,12 @@
   },
   "2026-11-13": {
     "chegada": "09:00",
-    "saida": "14:00",
+    "saida": "18:00",
     "anotacoes": [
       {
-        "tipo": "Saída antecipada",
-        "texto": "Saiu às 14h para ir a uma palestra no Hack and Play",
-        "registrado_em": "2026-11-16 08:53"
+        "tipo": "Outro",
+        "texto": "Ficou na loja até as 14h e depois foi para a palestra no Hack and Play; terminou às 18h (contado como trabalho)",
+        "registrado_em": "2026-11-19 10:03"
       }
     ]
   },
