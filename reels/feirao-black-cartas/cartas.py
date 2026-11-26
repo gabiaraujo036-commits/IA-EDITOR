@@ -21,9 +21,11 @@ if "--dourado" not in sys.argv:  # padrão: só preto, vermelho e branco/cinza
 
 CARROS = [
     dict(marca="CITROËN", modelo="C4 CACTUS", versao="Feel 1.6 16V Flex Aut.",
-         stats=[("ANO", "2022/2022"), ("KM", "62.108"), ("CÂMBIO", "Automático"), ("COMBUSTÍVEL", "Flex")], extras=[]),
+         stats=[("ANO", "2022/2022"), ("KM", "62.108"), ("CÂMBIO", "Automático"), ("COMBUSTÍVEL", "Flex")],
+         extras=["Central multimídia", "CarPlay · Android Auto", "Câmera de ré", "Ar digital"]),
     dict(marca="VOLKSWAGEN", modelo="NIVUS", versao="Comfortline 1.0 200 TSI Flex Aut.",
-         stats=[("ANO", "2025/2026"), ("KM", "12.000"), ("CÂMBIO", "Automático"), ("COMBUSTÍVEL", "Flex")], extras=[]),
+         stats=[("ANO", "2025/2026"), ("KM", "12.000"), ("CÂMBIO", "Automático"), ("COMBUSTÍVEL", "Flex")],
+         extras=["CarPlay sem fio", "Sensor de estacionamento", "Airbag de cortina", "Ar digital"]),
     dict(marca="CITROËN", modelo="AIRCROSS", versao="Aircross7 Feel 1.0 Flex Tb. 200 Aut.",
          stats=[("ANO", "2024/2025"), ("KM", "41.459"), ("CÂMBIO", "Automático"), ("COMBUSTÍVEL", "Flex")],
          extras=["7 lugares", "Central multimídia", "CarPlay · Android Auto"]),
@@ -85,11 +87,10 @@ def carta(i, c):
         if x + tw > iw - 40: x = 44; y += 78
         d.rounded_rectangle((x, y, x + tw, y + 60), 30, outline=(255, 255, 255, 90), width=2)
         d.text((x + 18, y + 13), v, font=f); x += tw + 10
-    y += 92
-    for k, e in enumerate(c["extras"][:4]):
-        ex = 44 + (k % 2) * (iw - 88) // 2; ey = y + (k // 2) * 50
-        d.ellipse((ex + 2, ey + 12, ex + 16, ey + 26), fill=RED)
-        d.text((ex + 30, ey), e, font=fit(d, e, (iw - 88) // 2 - 40, 30, "Medium"), fill=(222, 222, 228))
+    y += 82
+    for e in c["extras"][:4]:
+        d.ellipse((46, y + 12, 60, y + 26), fill=RED)
+        d.text((76, y), e, font=F(30, "Medium"), fill=(222, 222, 228)); y += 43
     d.line((44, ih - 80, iw - 44, ih - 80), fill=(255, 255, 255, 30), width=2)
     d.text((44, ih - 58), "MARIO CAR", font=F(28, "Black"), fill=(255, 255, 255, 120))
     t = "FEIRÃO BLACK"; d.text((iw - 44 - d.textlength(t, font=F(28, "Bold")), ih - 58), t, font=F(28, "Bold"), fill=RED)
