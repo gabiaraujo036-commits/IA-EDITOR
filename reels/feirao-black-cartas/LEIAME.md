@@ -17,4 +17,8 @@ C4 Cactus, Nivus, Aircross 7 lugares, Duster, Oroch ou Elantra. Escolheu? Leva c
 É a última semana, corre! Chama no direct.
 *Consulte condições na loja.
 #FeirãoBlack #MarioCar #IPVA2027 #Seminovos #CarroNovo
-- Variante sem dourado: `reels-feirao-black-cartas-sem-dourado.mp4` (`cartas.py ... --sem-dourado`).
+## Versões
+- `reels-feirao-black-cartas-v2.mp4` (atual): carta estilo vitrine (foto grande sem deformar, nome à esquerda,
+  fita diagonal "IPVA 2027 PAGO"), preto com detalhes em vermelho, sem dourado. Capa: `capa-v2.png`.
+- `reels-feirao-black-cartas-sem-dourado.mp4` e `reels-feirao-black-cartas.mp4`: versões anteriores.
+- `cartas.py` gera a v2 por padrão (`--dourado` volta as cores com dourado no fundo).

@@ -16,7 +16,7 @@ def F(s, w="ExtraBold"): return ImageFont.truetype(f"{FD}Inter-{w}.otf", s)
 GOLD, GOLD2, GOLD3, INK = (247, 200, 80), (190, 120, 30), (120, 78, 18), (12, 12, 14)
 RED, RED2 = (225, 30, 55), (140, 10, 30)
 LABEL = GOLD
-if "--sem-dourado" in sys.argv:  # variante: só preto, vermelho e branco/cinza
+if "--dourado" not in sys.argv:  # padrão: só preto, vermelho e branco/cinza
     GOLD, GOLD2, GOLD3, LABEL = (225, 30, 55), (200, 20, 45), (110, 8, 25), (175, 175, 182)
 
 CARROS = [
@@ -54,61 +54,55 @@ def fit(d, txt, w, size, weight="Black"):
     while d.textlength(txt, font=F(size, weight)) > w: size -= 4
     return F(size, weight)
 
-# ---------- carta ----------
+# ---------- carta (estilo vitrine: foto grande, nome à esquerda, fita diagonal) ----------
 CW, CH = 780, 1200
+def foto_proporcional(im, w, h, cx=600, cy=520, largura=960):
+    """Recorta um retângulo com a MESMA proporção do espaço (w x h) e só reduz: o carro não deforma."""
+    ch = largura * h / w
+    x0, y0 = cx - largura / 2, cy - ch / 2
+    x0 = max(0, min(im.width - largura, x0)); y0 = max(0, min(im.height - ch, y0))
+    return im.crop((int(x0), int(y0), int(x0 + largura), int(y0 + ch))).resize((w, h), Image.LANCZOS)
+
 def carta(i, c):
-    card = Image.new("RGBA", (CW, CH), (0, 0, 0, 0))
-    borda = grad(CW, CH, GOLD, GOLD3)  # moldura dourada
-    card.paste(borda, (0, 0), rmask(CW, CH, 48))
-    b = 14; iw, ih = CW - 2 * b, CH - 2 * b
-    inner = grad(iw, ih, (26, 24, 26), (8, 8, 10))
-    d = ImageDraw.Draw(inner, "RGBA")
-    # textura de linhas finas
-    for y in range(0, ih, 6): d.line((0, y, iw, y), fill=(255, 255, 255, 5))
-    # topo: número e selo
-    d.rounded_rectangle((28, 28, 178, 82), 27, fill=RED)
-    ctext(d, 103, 37, f"Nº {i+1:02d}/{N:02d}", F(28))
-    selo = "FEIRÃO BLACK"
-    sw = d.textlength(selo, font=F(28)) + 44
-    d.rounded_rectangle((iw - 28 - sw, 28, iw - 28, 82), 27, outline=GOLD, width=3)
-    ctext(d, iw - 28 - sw / 2, 37, selo, F(28), fill=GOLD)
-    # nome
-    ctext(d, iw / 2, 108, c["marca"], F(34, "Bold"), fill=(200, 200, 205))
-    ctext(d, iw / 2, 146, c["modelo"], fit(d, c["modelo"], iw - 80, 110))
-    ctext(d, iw / 2, 268, c["versao"], fit(d, c["versao"], iw - 70, 34, "SemiBold"), fill=(215, 215, 220))
-    # foto
+    b = 4; iw, ih = CW - 2 * b, CH - 2 * b; PH = 650
+    inner = Image.new("RGB", (iw, ih), INK)
     foto = Image.open(f"{FOTOS}/{i+1}.webp").convert("RGB")
-    foto = foto.crop((110, 318, 1100, 888)).resize((iw - 56, 360), Image.LANCZOS)
-    fx, fy = 28, 322
-    sombra = Image.new("L", inner.size, 0); ImageDraw.Draw(sombra).rounded_rectangle((fx - 4, fy - 4, fx + foto.width + 4, fy + foto.height + 4), 30, fill=255)
-    inner.paste(grad(foto.width + 8, foto.height + 8, GOLD, GOLD2), (fx - 4, fy - 4), rmask(foto.width + 8, foto.height + 8, 30))
-    inner.paste(foto, (fx, fy), rmask(foto.width, foto.height, 26))
-    # atributos (2x2)
-    gy = fy + foto.height + 20; gw = (iw - 56 - 20) // 2; gh = 98
-    for k, (lab, val) in enumerate(c["stats"]):
-        x = 28 + (k % 2) * (gw + 20); y = gy + (k // 2) * (gh + 12)
-        d.rounded_rectangle((x, y, x + gw, y + gh), 22, fill=(255, 255, 255, 14), outline=(255, 255, 255, 40), width=2)
-        d.rounded_rectangle((x, y, x + 10, y + gh), 5, fill=RED)
-        d.text((x + 30, y + 12), lab, font=F(26, "Bold"), fill=LABEL)
-        d.text((x + 30, y + 42), val, font=fit(d, val, gw - 50, 46, "ExtraBold"), fill="white")
-    # habilidades
-    ey = gy + 2 * gh + 12 + 20
-    if c["extras"]:
-        xs = 28; row = 0
-        for e in c["extras"]:
-            t = "★ " + e; fnt = F(28, "SemiBold"); tw = d.textlength(t, font=fnt) + 40
-            if xs + tw > iw - 28: row += 1; xs = 28
-            y = ey + row * 60
-            d.rounded_rectangle((xs, y, xs + tw, y + 50), 25, fill=(225, 30, 55, 45), outline=RED, width=2)
-            d.text((xs + 20, y + 9), t, font=fnt, fill="white")
-            xs += tw + 12
-    else:
-        ctext(d, iw / 2, ey + 22, "MARIO CAR", F(54, "Black"), fill=(255, 255, 255, 40))
-    # faixa final
-    fy2 = ih - 96
-    inner.paste(grad(iw, 96, RED, RED2, True), (0, fy2), rmask(iw, 96, 0))
-    ctext(d, iw / 2, fy2 + 18, "IPVA 2027 PAGO", F(52, "Black"))
-    card.paste(inner, (b, b), rmask(iw, ih, 38))
+    inner.paste(foto_proporcional(foto, iw, PH, largura=880), (0, 0))
+    inner.paste(INK, (0, PH - 230, iw, PH), Image.linear_gradient("L").resize((iw, 230)))
+    inner.paste(INK, (0, PH, iw, ih))
+    d = ImageDraw.Draw(inner, "RGBA")
+    d.text((44, PH - 70), f"{i+1:02d} / {N:02d}", font=F(30, "Bold"), fill=RED)
+    d.text((38, PH - 34), c["modelo"], font=fit(d, c["modelo"], iw - 76, 140))
+    d.text((44, PH + 128), f"{c['marca'].title()} · {c['versao']}", font=fit(d, f"{c['marca'].title()} · {c['versao']}", iw - 80, 31, "Medium"), fill=(185, 185, 192))
+    vals = []
+    for lab, v in c["stats"]:
+        if lab == "ANO": v = v[:5] + v[-2:]
+        if lab == "KM": v = v + " km"
+        vals.append(v)
+    x, y = 44, PH + 196
+    for v in vals:
+        f = F(29, "Bold"); tw = d.textlength(v, font=f) + 36
+        if x + tw > iw - 40: x = 44; y += 78
+        d.rounded_rectangle((x, y, x + tw, y + 60), 30, outline=(255, 255, 255, 90), width=2)
+        d.text((x + 18, y + 13), v, font=f); x += tw + 10
+    y += 92
+    for k, e in enumerate(c["extras"][:4]):
+        ex = 44 + (k % 2) * (iw - 88) // 2; ey = y + (k // 2) * 50
+        d.ellipse((ex + 2, ey + 12, ex + 16, ey + 26), fill=RED)
+        d.text((ex + 30, ey), e, font=fit(d, e, (iw - 88) // 2 - 40, 30, "Medium"), fill=(222, 222, 228))
+    d.line((44, ih - 80, iw - 44, ih - 80), fill=(255, 255, 255, 30), width=2)
+    d.text((44, ih - 58), "MARIO CAR", font=F(28, "Black"), fill=(255, 255, 255, 120))
+    t = "FEIRÃO BLACK"; d.text((iw - 44 - d.textlength(t, font=F(28, "Bold")), ih - 58), t, font=F(28, "Bold"), fill=RED)
+    card = Image.new("RGBA", (CW, CH), (0, 0, 0, 0))
+    card.paste(grad(CW, CH, (62, 62, 70), (28, 28, 32)), (0, 0), rmask(CW, CH, 44))
+    card.paste(inner, (b, b), rmask(iw, ih, 40))
+    # fita diagonal no canto
+    rib = Image.new("RGBA", (900, 92), RED); rd = ImageDraw.Draw(rib)
+    ctext(rd, 450, 20, "IPVA 2027 PAGO", F(42, "Black"))
+    rib = rib.rotate(-35, expand=True, resample=Image.BICUBIC)
+    lay = Image.new("RGBA", (CW, CH), (0, 0, 0, 0)); lay.paste(rib, (CW - rib.width // 2 - 150, -rib.height // 2 + 120), rib)
+    lay.putalpha(ImageChops.multiply(lay.getchannel("A"), rmask(CW, CH, 44)))
+    card.alpha_composite(lay)
     return card
 
 cartas = [carta(i, c) for i, c in enumerate(CARROS)]
