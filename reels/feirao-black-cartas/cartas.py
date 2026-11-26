@@ -13,7 +13,7 @@ W, H, FPS = 1080, 1920, 30
 FD = "/usr/share/fonts/opentype/inter/"
 def F(s, w="ExtraBold"): return ImageFont.truetype(f"{FD}Inter-{w}.otf", s)
 
-RED, RED2, GOLD, GOLD2 = (225, 30, 55), (140, 10, 30), (247, 200, 80), (190, 120, 30)
+GOLD, GOLD2, GOLD3, INK = (247, 200, 80), (190, 120, 30), (120, 78, 18), (12, 12, 14)
 
 CARROS = [
     dict(marca="CITROËN", modelo="C4 CACTUS", versao="Feel 1.6 16V Flex Aut.",
@@ -54,16 +54,16 @@ def fit(d, txt, w, size, weight="Black"):
 CW, CH = 780, 1200
 def carta(i, c):
     card = Image.new("RGBA", (CW, CH), (0, 0, 0, 0))
-    borda = grad(CW, CH, GOLD, RED)  # moldura dourado -> vermelho
+    borda = grad(CW, CH, GOLD, GOLD3)  # moldura dourada
     card.paste(borda, (0, 0), rmask(CW, CH, 48))
     b = 14; iw, ih = CW - 2 * b, CH - 2 * b
-    inner = grad(iw, ih, (48, 8, 16), (12, 12, 16))
+    inner = grad(iw, ih, (38, 32, 22), (8, 8, 10))
     d = ImageDraw.Draw(inner, "RGBA")
     # textura de linhas finas
     for y in range(0, ih, 6): d.line((0, y, iw, y), fill=(255, 255, 255, 5))
     # topo: número e selo
-    d.rounded_rectangle((28, 28, 178, 82), 27, fill=RED)
-    ctext(d, 103, 37, f"Nº {i+1:02d}/{N:02d}", F(28))
+    d.rounded_rectangle((28, 28, 178, 82), 27, fill=GOLD)
+    ctext(d, 103, 37, f"Nº {i+1:02d}/{N:02d}", F(28), fill=INK)
     selo = "FEIRÃO BLACK"
     sw = d.textlength(selo, font=F(28)) + 44
     d.rounded_rectangle((iw - 28 - sw, 28, iw - 28, 82), 27, outline=GOLD, width=3)
@@ -84,7 +84,7 @@ def carta(i, c):
     for k, (lab, val) in enumerate(c["stats"]):
         x = 28 + (k % 2) * (gw + 20); y = gy + (k // 2) * (gh + 12)
         d.rounded_rectangle((x, y, x + gw, y + gh), 22, fill=(255, 255, 255, 14), outline=(255, 255, 255, 40), width=2)
-        d.rounded_rectangle((x, y, x + 10, y + gh), 5, fill=RED)
+        d.rounded_rectangle((x, y, x + 10, y + gh), 5, fill=GOLD)
         d.text((x + 30, y + 12), lab, font=F(26, "Bold"), fill=GOLD)
         d.text((x + 30, y + 42), val, font=fit(d, val, gw - 50, 46, "ExtraBold"), fill="white")
     # habilidades
@@ -95,15 +95,15 @@ def carta(i, c):
             t = "★ " + e; fnt = F(28, "SemiBold"); tw = d.textlength(t, font=fnt) + 40
             if xs + tw > iw - 28: row += 1; xs = 28
             y = ey + row * 60
-            d.rounded_rectangle((xs, y, xs + tw, y + 50), 25, fill=(225, 30, 55, 60), outline=RED, width=2)
+            d.rounded_rectangle((xs, y, xs + tw, y + 50), 25, fill=(247, 200, 80, 28), outline=GOLD, width=2)
             d.text((xs + 20, y + 9), t, font=fnt, fill="white")
             xs += tw + 12
     else:
         ctext(d, iw / 2, ey + 22, "MARIO CAR", F(54, "Black"), fill=(255, 255, 255, 40))
     # faixa final
     fy2 = ih - 96
-    inner.paste(grad(iw, 96, RED, RED2, True), (0, fy2), rmask(iw, 96, 0))
-    ctext(d, iw / 2, fy2 + 18, "IPVA 2027 PAGO", F(52, "Black"))
+    inner.paste(grad(iw, 96, GOLD, GOLD2, True), (0, fy2), rmask(iw, 96, 0))
+    ctext(d, iw / 2, fy2 + 18, "IPVA 2027 PAGO", F(52, "Black"), fill=INK)
     card.paste(inner, (b, b), rmask(iw, ih, 38))
     return card
 
@@ -116,7 +116,7 @@ def fundo():
     img = Image.new("RGB", (W, H), (8, 8, 10))
     glow = Image.new("L", (W, H), 0); ImageDraw.Draw(glow).ellipse((-350, 520, W + 350, 1650), fill=255)
     glow = glow.filter(ImageFilter.GaussianBlur(230))
-    img = Image.composite(Image.new("RGB", (W, H), (170, 10, 35)), img, glow.point(lambda v: int(v * .7)))
+    img = Image.composite(Image.new("RGB", (W, H), (70, 56, 26)), img, glow.point(lambda v: int(v * .6)))
     st = Image.new("L", (W, H), 0); sd = ImageDraw.Draw(st)
     for k in range(-6, 14):
         x = k * 150; sd.polygon([(x, 0), (x + 36, 0), (x + 36 - 800, 800), (x - 800, 800)], fill=255)
@@ -127,9 +127,9 @@ BG = fundo()
 
 def cabecalho():
     lay = Image.new("RGBA", (W, 400), (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
-    d.rounded_rectangle((330, 70, 750, 130), 30, fill=RED); ctext(d, 540, 80, "ÚLTIMA SEMANA", F(38))
+    d.rounded_rectangle((330, 70, 750, 130), 30, fill=GOLD); ctext(d, 540, 80, "ÚLTIMA SEMANA", F(38), fill=INK)
     ctext(d, 540, 140, "FEIRÃO", F(150, "Black"))
-    ctext(d, 540, 280, "BLACK", F(110, "Black"), fill=RED)
+    ctext(d, 540, 280, "BLACK", F(110, "Black"), fill=GOLD)
     # brilho dourado sob o título
     d.rectangle((390, 400 - 8, 690, 400 - 4), fill=GOLD)
     return lay
@@ -209,21 +209,21 @@ def tela_final(frame, u):
     a2 = eob((u - 0.5) / 0.3)
     if a2 > 0:
         bx = Image.new("RGBA", (920, 300), (0, 0, 0, 0)); bd = ImageDraw.Draw(bx)
-        bd.rounded_rectangle((0, 0, 919, 299), 44, fill="white")
-        ctext(bd, 460, 22, "LEVA COM", F(52), fill=(12, 12, 14))
-        ctext(bd, 460, 80, "IPVA 2027", F(150, "Black"), fill=RED)
+        bd.rounded_rectangle((0, 0, 919, 299), 44, fill=(16, 16, 18), outline=GOLD, width=6)
+        ctext(bd, 460, 22, "LEVA COM", F(52), fill="white")
+        ctext(bd, 460, 80, "IPVA 2027", F(150, "Black"), fill=GOLD)
         s = max(.01, a2); bx = bx.resize((int(920 * s), int(300 * s)))
         ov.paste(bx, (540 - bx.width // 2, 1410 - bx.height // 2), bx)
         d = ImageDraw.Draw(ov)
     a3 = ease((u - 0.62) / 0.2)
     if a3 > 0:
-        ctext(d, 540, 1575, "PAGO!", F(84, "Black"), fill=(*GOLD, int(255 * a3)))
+        ctext(d, 540, 1575, "PAGO!", F(84, "Black"), fill=(255, 255, 255, int(255 * a3)))
     a4 = ease((u - 0.7) / 0.2)
     if a4 > 0:
         pul = 1 + 0.04 * math.sin(u * 30)
         bw, bh = int(680 * pul), int(108 * pul)
-        d.rounded_rectangle((540 - bw // 2, 1720 - bh // 2, 540 + bw // 2, 1720 + bh // 2), bh // 2, fill=(*RED, int(255 * a4)))
-        ctext(d, 540, 1720 - 32, "CHAMA NO DIRECT", F(58), fill=(255, 255, 255, int(255 * a4)))
+        d.rounded_rectangle((540 - bw // 2, 1720 - bh // 2, 540 + bw // 2, 1720 + bh // 2), bh // 2, fill=(*GOLD, int(255 * a4)))
+        ctext(d, 540, 1720 - 32, "CHAMA NO DIRECT", F(58), fill=(*INK, int(255 * a4)))
         ctext(d, 540, 1810, "*Consulte condições na loja.", F(30, "Medium"), fill=(190, 190, 195, int(255 * a4)))
     frame.alpha_composite(ov)
 

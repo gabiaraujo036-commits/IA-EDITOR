@@ -1,6 +1,6 @@
 # Reels – Feirão Black em cartas (IPVA 2027 pago)
 
-25 s · 1080×1920 · 30 fps. Seis carros do estoque viram cartas de jogo que deslizam para o lado,
+25 s · 1080×1920 · 30 fps. Visual preto com dourado (sem vermelho). Seis carros do estoque viram cartas de jogo que deslizam para o lado,
 com um "dedo" mostrando a escolha. No fim aparece o leque com as 6 cartas e a chamada
 "Escolheu a sua? Leva com IPVA 2027 pago! Chama no direct".
 Sem locução: só a batida, o whoosh de cada carta e um impacto no final.
