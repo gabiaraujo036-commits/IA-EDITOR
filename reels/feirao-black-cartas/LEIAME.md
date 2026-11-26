@@ -22,4 +22,6 @@ C4 Cactus, Nivus, Aircross 7 lugares, Duster, Oroch ou Elantra. Escolheu? Leva c
   fita diagonal "IPVA 2027 PAGO"), preto com detalhes em vermelho, sem dourado. Capa: `capa-v2.png`.
 - `reels-feirao-black-cartas-sem-dourado.mp4` e `reels-feirao-black-cartas.mp4`: versões anteriores.
 - `cartas.py` gera a v2 por padrão (`--dourado` volta as cores com dourado no fundo).
-- Post estático: `post-feed.png` (1080×1350) e `post-story.png` (1080×1920), gerados por `python3 post.py` a partir das cartas.
+- Post estático (feed 1080×1350), sem cartas, com os carros em destaque: `post-feed-a.png` (Nivus em destaque + vitrine)
+  e `post-feed-b.png` (grade com os 6). Gerar: `python3 post.py <pasta com 1.webp..6.webp>`.
+  `post-feed.png`/`post-story.png` são a versão antiga, com as cartas em leque.
