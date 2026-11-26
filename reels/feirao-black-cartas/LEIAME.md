@@ -17,3 +17,4 @@ C4 Cactus, Nivus, Aircross 7 lugares, Duster, Oroch ou Elantra. Escolheu? Leva c
 É a última semana, corre! Chama no direct.
 *Consulte condições na loja.
 #FeirãoBlack #MarioCar #IPVA2027 #Seminovos #CarroNovo
+- Variante sem dourado: `reels-feirao-black-cartas-sem-dourado.mp4` (`cartas.py ... --sem-dourado`).

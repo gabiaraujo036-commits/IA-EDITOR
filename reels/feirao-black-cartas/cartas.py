@@ -15,6 +15,9 @@ def F(s, w="ExtraBold"): return ImageFont.truetype(f"{FD}Inter-{w}.otf", s)
 
 GOLD, GOLD2, GOLD3, INK = (247, 200, 80), (190, 120, 30), (120, 78, 18), (12, 12, 14)
 RED, RED2 = (225, 30, 55), (140, 10, 30)
+LABEL = GOLD
+if "--sem-dourado" in sys.argv:  # variante: só preto, vermelho e branco/cinza
+    GOLD, GOLD2, GOLD3, LABEL = (225, 30, 55), (200, 20, 45), (110, 8, 25), (175, 175, 182)
 
 CARROS = [
     dict(marca="CITROËN", modelo="C4 CACTUS", versao="Feel 1.6 16V Flex Aut.",
@@ -86,7 +89,7 @@ def carta(i, c):
         x = 28 + (k % 2) * (gw + 20); y = gy + (k // 2) * (gh + 12)
         d.rounded_rectangle((x, y, x + gw, y + gh), 22, fill=(255, 255, 255, 14), outline=(255, 255, 255, 40), width=2)
         d.rounded_rectangle((x, y, x + 10, y + gh), 5, fill=RED)
-        d.text((x + 30, y + 12), lab, font=F(26, "Bold"), fill=GOLD)
+        d.text((x + 30, y + 12), lab, font=F(26, "Bold"), fill=LABEL)
         d.text((x + 30, y + 42), val, font=fit(d, val, gw - 50, 46, "ExtraBold"), fill="white")
     # habilidades
     ey = gy + 2 * gh + 12 + 20
