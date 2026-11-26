@@ -25,3 +25,5 @@ C4 Cactus, Nivus, Aircross 7 lugares, Duster, Oroch ou Elantra. Escolheu? Leva c
 - Post estático (feed 1080×1350), sem cartas, com os carros em destaque: `post-feed-a.png` (Nivus em destaque + vitrine)
   e `post-feed-b.png` (grade com os 6). Gerar: `python3 post.py <pasta com 1.webp..6.webp>`.
   `post-feed.png`/`post-story.png` são a versão antiga, com as cartas em leque.
+- Post "Última volta" (jogo de corrida com a cara da Mario Car): `post-corrida-feed.png`, gerado por `python3 post_corrida.py recortes`.
+  `recortes/` tem os carros sem fundo (feitos com rembg).
